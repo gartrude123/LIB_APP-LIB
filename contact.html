@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="log.jpeg" alt="Library Logo">
+        </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="collections.html">Special Collections</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div id="auth-header-container">
+            <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
+        </div>
+        </div>
+    </header>
+    <main>
+        <section class="contact">
+            <h2><i class="fa fa-envelope"></i> Contact Us</h2>
+            <form class="contact-form">
+                <label>Full Name*</label>
+                <input type="text" required>
+                <label>Email*</label>
+                <input type="email" required>
+                <label>Message*</label>
+                <textarea required></textarea>
+                <div class="checkboxes">
+                    <label><input type="checkbox"> Phone</label>
+                    <label><input type="checkbox"> Email</label>
+                    <label><input type="checkbox"> WhatsApp / Chat</label>
+                </div>
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+
+            <div class="contact-info">
+                <h3>Our Contact Information</h3>
+                <p><i class="fa fa-phone"></i> <a href="tel:+256788622619" target="_blank"
+                        style="color: inherit; text-decoration: none;">+256 788 622 619</a> (<a
+                        href="https://wa.me/256788622619" target="_blank"
+                        style="color: inherit; text-decoration: none;">WhatsApp</a>)</p>
+                <p><i class="fa fa-envelope"></i> library@bugemauniv.ac.ug</p>
+                <p><i class="fa fa-comments"></i> WhatsApp / Live Chat</p>
+                <p><i class="fa fa-map-marker-alt"></i> Bugema University, P.O. Box 6529, Kampala, Uganda</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section about">
+                <div class="footer-logo">
+                    <img src="log.jpeg" alt="Bugema University Library">
+                </div>
+                <p>Empowering education through accessible knowledge and resources.</p>
+                <div class="contact-info">
+                    <p><i class="fa fa-phone"></i> +256 788622619</p>
+                    <p><i class="fa fa-envelope"></i> library@bugemauniv.ac.ug</p>
+                    <p><i class="fa fa-map-marker-alt"></i> Bugema University, Main Campus</p>
+                </div>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="books.html">Books & Resources</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="collections.html">Special Collections</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="books.html#eresources-section">E-Books</a></li>
+                    <li><a href="books.html#catalogue-section">Catalogue</a></li>
+                    <li><a href="books.html#reference-section">Reference Materials</a></li>
+                    <li><a href="books.html#order-section">Interlibrary Loan</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Help & Support</h4>
+                <ul>
+                    <li><a href="books.html#help-section">Q&A / Help Desk</a></li>
+                    <li><a href="#">User Guide</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section social">
+                <h4>Stay Connected</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Bugema University Library. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-sign-in-alt"></i> Library Login</h2>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginCardNumber">Library Card Number *</label>
+                    <input type="text" id="loginCardNumber" required placeholder="e.g., LIB-123456" maxlength="12">
+                </div>
+                <div class="form-group">
+                    <label for="loginEmail">Email Address *</label>
+                    <input type="email" id="loginEmail" required placeholder="Enter your registered email">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-user-plus"></i> Library Registration</h2>
+                <p>Get your library card to access all resources</p>
+            </div>
+            <form id="registerForm">
+                <div class="register-form-scroll">
+                    <div class="form-group"><label for="regFullName">Full Name *</label><input type="text"
+                            id="regFullName" required placeholder="Your full name"></div>
+                    <div class="form-group"><label for="regEmail">Email Address *</label><input type="email"
+                            id="regEmail" required placeholder="your.email@example.com"></div>
+                    <div class="form-group"><label for="regPassword">Password *</label><input type="password"
+                            id="regPassword" required placeholder="Create a password" minlength="6"></div>
+                    <div class="form-group"><label for="regPhone">Phone Number *</label><input type="tel" id="regPhone"
+                            required placeholder="+256 xxx xxx xxx"></div>
+                    <div class="form-group">
+                        <label for="regUserType">User Type *</label>
+                        <select id="regUserType" required>
+                            <option value="">Select your type</option>
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty/Staff</option>
+                            <option value="alumni">Alumni</option>
+                            <option value="community">Community Member</option>
+                            <option value="researcher">Researcher</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="regDepartment">Department</label><input type="text"
+                            id="regDepartment" placeholder="e.g., Computer Science"></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register & Get Library Card</button>
+                <p class="form-footer">Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content success-content">
+            <i class="fa fa-check-circle"></i>
+            <h3>Success!</h3>
+            <p id="successMessage"></p>
+            <button class="btn btn-primary" id="closeSuccessBtn">Close</button>
+        </div>
+    </div>
+
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa fa-bell"></i> Notification</h3>
+            </div>
+            <div class="modal-body">
+                <p id="notificationMessage"></p>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" id="closeNotificationBtn">OK</button></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

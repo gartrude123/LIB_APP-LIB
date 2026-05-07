@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Archives - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo"><img src="log.jpeg" alt="Library Logo"></div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="collections.html" class="active">Special Collections</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="search-login">
+            <div id="auth-header-container">
+                <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="collections">
+            <h2><i class="fa fa-folder-open"></i> Institutional Archives</h2>
+            <p>Preserving the heritage and administrative history of Bugema University.</p>
+            <div class="grid">
+                <div class="card">
+                    <i class="fa fa-certificate big-icon"></i>
+                    <h3>Original Charter</h3>
+                    <p>The 1948 founding documents and official university charters.</p>
+                </div>
+                <div class="card">
+                    <i class="fa fa-address-book big-icon"></i>
+                    <h3>Student Registries</h3>
+                    <p>Historical enrollment records and alumni lists dating back decades.</p>
+                </div>
+                <div class="card">
+                    <i class="fa fa-camera-retro big-icon"></i>
+                    <h3>Historical Photo Gallery</h3>
+                    <p>A visual history of campus development and student life through the ages.</p>
+                </div>
+            </div>
+            <div style="margin-top: 40px;">
+                <a href="collections.html" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to
+                    Collections</a>
+            </div>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrowing & Returns - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <!-- Header content from index.html -->
+    </header>
+    <main>
+        <section class="request-form-page">
+            <h2><i class="fa fa-exchange-alt"></i> Borrowing & Returns</h2>
+            <form id="borrowReturnForm" class="request-form">
+                <div class="form-group">
+                    <label for="transactionType">Transaction Type *</label>
+                    <select id="transactionType" class="form-control" required>
+                        <option value="">Select type</option>
+                        <option value="borrow">Borrow Book</option>
+                        <option value="return">Return Book</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bookIdentifier">Book Title or ID *</label>
+                    <input type="text" id="bookIdentifier" class="form-control" required
+                        placeholder="Enter book title or library ID">
+                </div>
+                <div class="form-group">
+                    <label for="feedbackRating">Rate our service (1-5) *</label>
+                    <input type="number" id="feedbackRating" class="form-control" min="1" max="5" value="5" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary">Cancel</button>
+            </form>
+            <div id="borrowReturnFeedback" class="feedback-message" style="display:none;"></div>
+        </section>
+    </main>
+    <footer>
+        <!-- Footer content from index.html -->
+    </footer>
+    <script src="app.js"></script>
+</body>
+
+</html>

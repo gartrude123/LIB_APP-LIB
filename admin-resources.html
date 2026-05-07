@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Resource Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="log.jpeg" alt="Library Logo">
+        </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li class="nav-item-dropdown">
+                    <a href="#" class="active">Admin <i class="fa fa-caret-down"></i></a>
+                    <ul class="nav-dropdown-menu">
+                        <li><a href="adminA.html">Manage Users</a></li>
+                        <li><a href="admin-resources.html">Manage Resources</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="admin-panel">
+            <h2><i class="fa fa-book"></i> Resource Management</h2>
+
+            <!-- Add New Book -->
+            <div class="admin-section">
+                <h3><i class="fa fa-plus"></i> Add New Book</h3>
+                <form id="addBookForm">
+                    <label>Title*</label><input type="text" required>
+                    <label>Author*</label><input type="text" required>
+                    <label>ISBN*</label><input type="text" required>
+                    <label>Category*</label>
+                    <select required>
+                        <option value="">Select Category</option>
+                        <option>Management</option>
+                        <option>Research</option>
+                        <option>Science</option>
+                        <option>Technology</option>
+                    </select>
+                    <label>Quantity*</label><input type="number" required>
+                    <button type="submit" class="btn">Add Book</button>
+                </form>
+            </div>
+
+            <!-- Add E-Resource -->
+            <div class="admin-section">
+                <h3><i class="fa fa-plus"></i> Add E-Resource</h3>
+                <form id="addResourceForm">
+                    <label>Resource Title*</label><input type="text" required>
+                    <label>Reason*</label><input type="text" required>
+                    <label>Type*</label>
+                    <select required>
+                        <option value="">Select Type</option>
+                        <option>Database</option>
+                        <option>Journal</option>
+                        <option>E-Book</option>
+                    </select>
+                    <label>URL*</label><input type="url" required>
+                    <label>Provider*</label><input type="text" required>
+                    <button type="submit" class="btn">Add E-Resource</button>
+                </form>
+            </div>
+
+            <!-- Manage Collections -->
+            <div class="admin-section">
+                <h3><i class="fa fa-tasks"></i> Manage Collections</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>B001</td>
+                            <td>Principles of Management</td>
+                            <td>Book</td>
+                            <td>Management</td>
+                            <td>Available</td>
+                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
+                        </tr>
+                        <tr>
+                            <td>B002</td>
+                            <td>Research Methods</td>
+                            <td>Book</td>
+                            <td>Research</td>
+                            <td>Available</td>
+                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
+                        </tr>
+                        <tr>
+                            <td>E001</td>
+                            <td>JSTOR Database</td>
+                            <td>E-Resource</td>
+                            <td>Journals</td>
+                            <td>Active</td>
+                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
+                        </tr>
+                        <tr>
+                            <td>E002</td>
+                            <td>ScienceDirect</td>
+                            <td>E-Resource</td>
+                            <td>Journals</td>
+                            <td>Active</td>
+                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
+                        </tr>
+                        <tr>
+                            <td>P001</td>
+                            <td>Bugema University Journal</td>
+                            <td>Publication</td>
+                            <td>Journal</td>
+                            <td>Published</td>
+                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn">View All Collections</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Bugema University. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rare Books - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo"><img src="log.jpeg" alt="Library Logo"></div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="collections.html" class="active">Special Collections</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="search-login">
+            <div id="auth-header-container">
+                <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="collections">
+            <h2><i class="fa fa-book"></i> Rare & Uncommon Books</h2>
+            <p>A curated collection of historical and theological significance.</p>
+            <div class="grid">
+                <div class="card">
+                    <i class="fa fa-bible big-icon"></i>
+                    <h3>1862 Holy Bible</h3>
+                    <p>A rare Oxford edition featuring hand-crafted leather binding and original illustrations.</p>
+                </div>
+                <div class="card">
+                    <i class="fa fa-feather big-icon"></i>
+                    <h3>Early Mission Records</h3>
+                    <p>Hand-written accounts of the first theological missions in East Africa (1900-1920).</p>
+                </div>
+                <div class="card">
+                    <i class="fa fa-scroll big-icon"></i>
+                    <h3>Ancient Scripts</h3>
+                    <p>Historical theological manuscripts preserved from the founding years of the institution.</p>
+                </div>
+            </div>
+            <div style="margin-top: 40px;">
+                <a href="collections.html" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to
+                    Collections</a>
+            </div>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+
+</html>

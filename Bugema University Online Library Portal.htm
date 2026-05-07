@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bugema University Online Library Portal</title>
+    <link rel="stylesheet" href="Bugema%20University%20Online%20Library%20Portal_files/styles.css">
+    <!-- Icons -->
+    <link rel="stylesheet" href="Bugema%20University%20Online%20Library%20Portal_files/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="Bugema%20University%20Online%20Library%20Portal_files/log.jpeg" alt="Library Logo">
+        </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="http://127.0.0.1:5500/index.html">Home</a></li>
+                <li><a href="http://127.0.0.1:5500/books.html">Books &amp; Resources</a></li>
+                <li><a href="http://127.0.0.1:5500/services.html">Services</a></li>
+                <li><a href="http://127.0.0.1:5500/about.html">About Us</a></li>
+                <li><a href="http://127.0.0.1:5500/collections.html">Special Collections</a></li>
+                <li><a href="http://127.0.0.1:5500/contact.html">Contact Us</a></li>
+                <li class="nav-item-dropdown">
+                    <a href="#">Admin <i class="fa fa-caret-down"></i></a>
+                    <ul class="nav-dropdown-menu">
+                        <li><a href="http://127.0.0.1:5500/adminA.html">Manage Users</a></li>
+                        <li><a href="http://127.0.0.1:5500/admin-resources.html">Manage Resources</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div class="search-login">
+            <div class="search-wrapper">
+                <input type="text" id="globalSearch" placeholder="Search catalogue, ebooks, journals...">
+                <button class="btn search-btn"><i class="fa fa-search"></i></button>
+            </div>
+            <div id="auth-header-container">
+                <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="hero">
+            <div class="hero-text">
+                <h1>Welcome to Bugema University Online Library Portal</h1>
+                <p>Access books, journals, services, and more — anytime, anywhere.</p>
+            </div>
+            <div class="hero-btns">
+                <a href="http://127.0.0.1:5500/books.html" class="btn btn-primary">Explore Resources</a>
+                <a href="http://127.0.0.1:5500/services.html" class="btn btn-secondary">View Services</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section about">
+                <div class="footer-logo">
+                    <img src="Bugema%20University%20Online%20Library%20Portal_files/log.jpeg" alt="Bugema University Library">
+                </div>
+                <p>Empowering education through accessible knowledge and resources.</p>
+                <div class="contact-info">
+                    <p><i class="fa fa-phone"></i> +256 200 903 100</p>
+                    <p><i class="fa fa-envelope"></i> library@bugemauniv.ac.ug</p>
+                    <p><i class="fa fa-map-marker-alt"></i> Bugema University, Main Campus</p>
+                </div>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="http://127.0.0.1:5500/index.html">Home</a></li>
+                    <li><a href="http://127.0.0.1:5500/books.html">Books &amp; Resources</a></li>
+                    <li><a href="http://127.0.0.1:5500/services.html">Services</a></li>
+                    <li><a href="http://127.0.0.1:5500/about.html">About Us</a></li>
+                    <li><a href="http://127.0.0.1:5500/collections.html">Special Collections</a></li>
+                    <li><a href="http://127.0.0.1:5500/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="http://127.0.0.1:5500/books.html#eresources-section">E-Books</a></li>
+                    <li><a href="http://127.0.0.1:5500/books.html#catalogue-section">Catalogue</a></li>
+                    <li><a href="http://127.0.0.1:5500/books.html#reference-section">Reference Materials</a></li>
+                    <li><a href="http://127.0.0.1:5500/books.html#order-section">Interlibrary Loan</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section links">
+                <h4>Help &amp; Support</h4>
+                <ul>
+                    <li><a href="http://127.0.0.1:5500/books.html#help-section">Q&amp;A / Help Desk</a></li>
+                    <li><a href="#">User Guide</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Terms &amp; Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section social">
+                <h4>Stay Connected</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Bugema University Library. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals (Copied from books.html for consistency) -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-sign-in-alt"></i> Library Login</h2>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginCardNumber">Library Card Number *</label>
+                    <input type="text" id="loginCardNumber" required="" placeholder="e.g., LIB-123456" maxlength="12">
+                </div>
+                <div class="form-group">
+                    <label for="loginEmail">Email Address *</label>
+                    <input type="email" id="loginEmail" required="" placeholder="Enter your registered email">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-user-plus"></i> Library Registration</h2>
+            </div>
+            <form id="registerForm">
+                <div class="register-form-scroll">
+                    <div class="form-group"><label for="regFullName">Full Name *</label><input type="text" id="regFullName" required=""></div>
+                    <div class="form-group"><label for="regEmail">Email Address *</label><input type="email" id="regEmail" required=""></div>
+                    <div class="form-group"><label for="regPassword">Password *</label><input type="password" id="regPassword" required="" minlength="6"></div>
+                    <div class="form-group"><label for="regPhone">Phone Number *</label><input type="tel" id="regPhone" required=""></div>
+                    <div class="form-group">
+                        <label for="regUserType">User Type *</label>
+                        <select id="regUserType" required="">
+                            <option value="student" selected="selected">Student</option>
+                            <option value="faculty">Faculty/Staff</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="regDepartment">Department</label><input type="text" id="regDepartment"></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register &amp; Get Library Card</button>
+                <p class="form-footer">Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content success-content">
+            <i class="fa fa-check-circle"></i>
+            <h3>Success!</h3>
+            <p id="successMessage"></p>
+            <button class="btn btn-primary" id="closeSuccessBtn">Close</button>
+        </div>
+    </div>
+
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa fa-bell"></i> Notification</h3>
+            </div>
+            <div class="modal-body">
+                <p id="notificationMessage"></p>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" id="closeNotificationBtn">OK</button></div>
+        </div>
+    </div>
+
+    <script src="Bugema%20University%20Online%20Library%20Portal_files/app.js"></script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+
+</body></html>

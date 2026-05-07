@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="log.jpeg" alt="Library Logo">
+        </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="collections.html">Special Collections</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="search-login">
+            <input type="text" placeholder="Search...">
+            <button class="btn"><i class="fa fa-search"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="registration-form">
+            <div class="form-container">
+                <h2><i class="fa fa-user-plus"></i> Library Registration</h2>
+                <p class="form-description">Please fill out the form below to register for library access</p>
+
+                <form class="registration-form-content">
+                    <div class="form-group">
+                        <label for="fullName">Full Name*</label>
+                        <input type="text" id="fullName" required placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address*</label>
+                        <input type="email" id="email" required placeholder="Enter your email address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number*</label>
+                        <input type="tel" id="phone" required placeholder="Enter your phone number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userType">User Type*</label>
+                        <select id="userType" required>
+                            <option value="">Select your user type</option>
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty/Staff</option>
+                            <option value="alumni">Alumni</option>
+                            <option value="community">Community Member</option>
+                            <option value="researcher">Researcher</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Contact Method*</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="contactMethod" value="email"> Email</label>
+                            <label><input type="checkbox" name="contactMethod" value="phone"> Phone</label>
+                            <label><input type="checkbox" name="contactMethod" value="sms"> SMS</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Agreement*</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" required> I agree to the library terms and conditions</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large">Send</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-columns">
+            <div>
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="books.html">Books & Resources</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="collections.html">Special Collections</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Help & Support</h4>
+                <ul>
+                    <li><a href="#">Q&A / Help Desk</a></li>
+                    <li><a href="#">User Guide</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Contact Us</h4>
+                <p><i class="fa fa-phone"></i> +256 200 903 100</p>
+                <p><i class="fa fa-envelope"></i> library@bugemauniv.ac.ug</p>
+                <p><i class="fa fa-comments"></i> WhatsApp / Live Chat</p>
+            </div>
+            <div>
+                <h4>Stay Connected</h4>
+                <div class="social-icons">
+                    <i class="fab fa-facebook"></i>
+                    <i class="fab fa-twitter"></i>
+                    <i class="fab fa-instagram"></i>
+                    <i class="fab fa-youtube"></i>
+                </div>
+            </div>
+        </div>
+        <p class="copyright">© 2025 Bugema University. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

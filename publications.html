@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Publications - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo"><img src="log.jpeg" alt="Library Logo"></div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="collections.html" class="active">Special Collections</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="search-login">
+            <div id="auth-header-container">
+                <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="collections">
+            <h2><i class="fa fa-university"></i> University Publications</h2>
+            <p>Academic research, journals, and theses produced by our faculty and students.</p>
+            <div class="grid">
+                <div class="card">
+                    <i class="fa fa-microchip big-icon"></i>
+                    <h3>IT Research Papers</h3>
+                    <p>Current publications and research journals from the Computer Science department.</p>
+                </div>
+                <div class="card">
+                    <i class="fa fa-user-graduate big-icon"></i>
+                    <h3>Theses & Dissertations</h3>
+                    <p>Postgraduate and Undergraduate research projects (2020-2025).</p>
+                </div>
+                <div class="card">
+                    <i class="fa fa-file-invoice big-icon"></i>
+                    <h3>Institutional Reports</h3>
+                    <p>Annual Vice-Chancellor reports and university strategic planning documents.</p>
+                </div>
+            </div>
+            <div style="margin-top: 40px;">
+                <a href="collections.html" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to
+                    Collections</a>
+            </div>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+
+</html>
