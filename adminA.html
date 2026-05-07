@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="log.jpeg" alt="Library Logo">
+        </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li class="nav-item-dropdown">
+                    <a href="#" class="active">Admin <i class="fa fa-caret-down"></i></a>
+                    <ul class="nav-dropdown-menu">
+                        <li><a href="adminA.html">Manage Users</a></li>
+                        <li><a href="admin-resources.html">Manage Resources</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="admin-panel">
+            <h2><i class="fa fa-user-shield"></i> Admin Panel</h2>
+
+            <!-- User List -->
+            <div class="admin-section">
+                <h3><i class="fa fa-users"></i> User List</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>U001</td>
+                            <td>John Musoke</td>
+                            <td>john.musoke@bugema.ac.ug</td>
+                            <td>Student</td>
+                            <td>Active</td>
+                            <td><button class="btn">Block</button></td>
+                        </tr>
+                        <tr>
+                            <td>U002</td>
+                            <td>Maria Nankya</td>
+                            <td>maria.nankya@bugema.ac.ug</td>
+                            <td>Staff</td>
+                            <td>Active</td>
+                            <td><button class="btn">Block</button></td>
+                        </tr>
+                        <tr>
+                            <td>U003</td>
+                            <td>Peter Ouma</td>
+                            <td>peter.ouma@bugema.ac.ug</td>
+                            <td>Student</td>
+                            <td>Active</td>
+                            <td><button class="btn">Block</button></td>
+                        </tr>
+                        <tr>
+                            <td>U004</td>
+                            <td>Grace Asim</td>
+                            <td>grace.asim@bugema.ac.ug</td>
+                            <td>Staff</td>
+                            <td class="blocked">Blocked</td>
+                            <td><button class="btn">Unblock</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn">Block Selected Accounts</button>
+            </div>
+
+            <!-- New User -->
+            <div class="admin-section">
+                <h3><i class="fa fa-user-plus"></i> New User</h3>
+                <form id="newUserForm">
+                    <label>Full Name*</label><input type="text" required>
+                    <label>Email*</label><input type="email" required>
+                    <label>Role*</label>
+                    <select required>
+                        <option value="">Select Role</option>
+                        <option>Student</option>
+                        <option>Staff</option>
+                        <option>Admin</option>
+                    </select>
+                    <label>Password*</label><input type="password" required>
+                    <button type="submit" class="btn">Add User</button>
+                </form>
+            </div>
+
+            <!-- Monitor Activity -->
+            <div class="admin-section">
+                <h3><i class="fa fa-chart-line"></i> Monitor Activity</h3>
+                <p><strong>Total Users:</strong> 1,245</p>
+                <p><strong>Active Today:</strong> 156</p>
+                <p><strong>Logins (This Week):</strong> 723</p>
+                <p><strong>Resources:</strong> 2,340</p>
+                <h4>Recent Activities</h4>
+                <ul>
+                    <li>John Musoke logged in – 10:15 AM</li>
+                    <li>Maria Nankya borrowed a book – 09:45 AM</li>
+                    <li>Peter Ouma accessed e-resource – 09:30 AM</li>
+                    <li>Grace Asim logged in – 09:10 AM</li>
+                </ul>
+                <button class="btn">View All Activity</button>
+            </div>
+
+            <!-- Block Accounts -->
+            <div class="admin-section">
+                <h3><i class="fa fa-ban"></i> Block Accounts</h3>
+                <form id="blockForm">
+                    <label>User ID or Email*</label><input type="text" required>
+                    <label>Reason*</label>
+                    <select required>
+                        <option value="">Select Reason</option>
+                        <option>Violation of Policies</option>
+                        <option>Suspicious Activity</option>
+                        <option>Requested by User</option>
+                    </select>
+                    <label>Notes (Optional)</label><textarea></textarea>
+                    <button type="submit" class="btn">Block Account</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Bugema University. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
