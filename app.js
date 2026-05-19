@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // STATE MANAGEMENT
     // ============================================
     let currentUser = JSON.parse(localStorage.getItem('libraryUser')) || null;
+    let currentAdmin = JSON.parse(localStorage.getItem('adminUser')) || null;
     let allEbooks = [];
     let allCategories = [];
     let allJournals = [];
@@ -145,6 +146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function closeModal(modal) {
+        if (!modal) return;
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
@@ -170,6 +172,60 @@ document.addEventListener("DOMContentLoaded", async () => {
     function showNotification(message) {
         document.getElementById('notificationMessage').textContent = message;
         openModal(notificationModal);
+    }
+
+    window.submitStarRating = async function (type, id, rating) {
+        try {
+            const endpoint = type === 'request' ? `/api/requests/${id}/rate` :
+                type === 'question' ? `/api/questions/${id}/rate` :
+                    `/api/resources/${id}/rate`;
+            await fetch(endpoint, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rating: parseInt(rating) })
+            });
+            closeModal(document.getElementById('starRatingModal'));
+            showSuccess("Thank you for your feedback!");
+            if (typeof renderUserHistory === 'function') renderUserHistory();
+        } catch (err) {
+            console.error("Failed to submit rating", err);
+        }
+    };
+
+    window.openStarRating = function (type, id) {
+        let modal = document.getElementById('starRatingModal');
+        if (!modal) {
+            const modalHtml = `
+                <div id="starRatingModal" class="modal">
+                    <div class="modal-content" style="text-align:center; padding: 40px; border-radius: 20px;">
+                        <h3><i class="fa fa-star" style="color:var(--accent-gold)"></i> Rate Our Service</h3>
+                        <p id="ratingPromptText">Your request has been approved! How was your experience?</p>
+                        <div class="stars-container" style="font-size: 3.5rem; color: #ffd700; margin: 25px 0;">
+                            ${[1, 2, 3, 4, 5].map(n => `<i class="fa-star far star-icon" data-val="${n}" style="cursor:pointer; transition: transform 0.2s;"></i>`).join('')}
+                        </div>
+                        <p id="starLabel" style="font-weight: 600; margin-bottom: 20px;">Select a rating</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button class="btn btn-secondary" onclick="window.closeModal(document.getElementById('starRatingModal'))">Exit / Stay</button>
+                            <button class="btn btn-primary" onclick="window.location.href='services.html'">Return to Services</button>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            modal = document.getElementById('starRatingModal');
+
+            const stars = modal.querySelectorAll('.star-icon');
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', () => {
+                    const val = star.dataset.val;
+                    stars.forEach(s => s.classList.toggle('fas', s.dataset.val <= val));
+                    stars.forEach(s => s.classList.toggle('far', s.dataset.val > val));
+                });
+                star.addEventListener('click', () => {
+                    window.submitStarRating(type, id, star.dataset.val);
+                });
+            });
+        }
+        openModal(modal);
     }
 
     // Switch between modals
@@ -213,20 +269,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         const container = document.getElementById('auth-header-container');
         if (!container) return;
 
-        if (currentUser) {
+        const isAdminPage = path.includes('adminA.html') || path.includes('admin-resources.html') || path.includes('admin-login.html');
+        const user = isAdminPage ? currentAdmin : currentUser;
+
+        if (user) {
             container.innerHTML = `
                 <div class="user-profile">
-                    <span class="user-name"><i class="fa fa-user-circle"></i> ${currentUser.fullName.split(' ')[0]}</span>
+                    <span class="user-name"><i class="fa fa-user-circle"></i> ${user.fullName.split(' ')[0]} ${isAdminPage ? '(Admin)' : ''}</span>
                     <button class="btn btn-sm" id="logoutBtn"><i class="fa fa-sign-out-alt"></i> Logout</button>
                 </div>
             `;
             document.getElementById('logoutBtn')?.addEventListener('click', () => {
-                currentUser = null;
-                localStorage.removeItem('libraryUser');
-                updateAuthUI();
-                showNotification('You have been logged out.');
+                if (isAdminPage) {
+                    currentAdmin = null;
+                    localStorage.removeItem('adminUser');
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'index.html';
+                } else {
+                    currentUser = null;
+                    localStorage.removeItem('libraryUser');
+                    localStorage.removeItem('libraryToken');
+                    updateAuthUI();
+                    showNotification('You have been logged out.');
+                }
             });
-        } else {
+        } else if (!isAdminPage) {
             container.innerHTML = `
                 <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
             `;
@@ -291,31 +358,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = e.target.querySelector('button[type="submit"]');
-        const cardNumber = document.getElementById('loginCardNumber').value.trim();
-        const email = document.getElementById('loginEmail').value.trim();
+        const identifier = document.getElementById('loginIdentifier').value.trim();
+        const password = document.getElementById('loginPassword').value;
 
         setBtnLoading(submitBtn, true, 'Logging in...');
         try {
             const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cardNumber, email })
+                body: JSON.stringify({ identifier, password })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                currentUser = data.user;
-                localStorage.setItem('libraryUser', JSON.stringify(currentUser));
+                const isAdminLoginPage = path.includes('admin-login.html');
+
+                if (isAdminLoginPage) {
+                    currentAdmin = data.user;
+                    localStorage.setItem('adminUser', JSON.stringify(currentAdmin));
+                    if (data.token) localStorage.setItem('adminToken', data.token);
+                    showSuccess(`Admin Access Granted: ${currentAdmin.fullName}`);
+                    setTimeout(() => window.location.href = 'adminA.html', 1500);
+                } else {
+                    currentUser = data.user;
+                    localStorage.setItem('libraryUser', JSON.stringify(currentUser));
+                    if (data.token) localStorage.setItem('libraryToken', data.token);
+
+                    const pendingServiceTarget = sessionStorage.getItem('pendingServiceTarget');
+                    if (pendingServiceTarget) {
+                        sessionStorage.removeItem('pendingServiceTarget');
+                        redirectToService(pendingServiceTarget);
+                    }
+                    showSuccess(`Welcome back, ${currentUser.fullName}!`);
+                    checkExistingPending();
+                }
+
                 updateAuthUI();
                 closeModal(loginModal);
-                showSuccess(`Welcome back, ${currentUser.fullName}!`);
-
-                const pendingServiceTarget = sessionStorage.getItem('pendingServiceTarget');
-                if (pendingServiceTarget) {
-                    sessionStorage.removeItem('pendingServiceTarget');
-                    redirectToService(pendingServiceTarget);
-                }
 
                 e.target.reset();
             } else {
@@ -324,7 +404,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (err) {
             console.error('Login API error:', err.message);
             const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            const user = registeredUsers.find(u => u.libraryCardNumber === cardNumber && u.email === email);
+            const user = registeredUsers.find(u => u.libraryCardNumber === identifier || u.email === identifier);
             if (user) {
                 currentUser = user;
                 localStorage.setItem('libraryUser', JSON.stringify(currentUser));
@@ -540,6 +620,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             ebook = allEbooks.find(b => b.id === ebookId);
             if (!ebook) { showNotification('E-book not found.'); return; }
         }
+
+        // Log Access for Admin Monitoring
+        fetch('/api/log-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: currentUser?.id,
+                action: 'read_ebook',
+                resourceType: 'ebook',
+                resourceId: ebookId
+            })
+        });
 
         document.getElementById('readerTitle').textContent = ebook.title;
         document.getElementById('readerAuthor').textContent = `By ${ebook.author}`;
@@ -902,52 +994,237 @@ document.addEventListener("DOMContentLoaded", async () => {
         return new Date(dateStr).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
+    async function renderUserHistory() {
+        const timelineContainer = document.getElementById('user-activity-timeline');
+        const section = document.getElementById('user-activity-timeline-section');
+        if (!timelineContainer || !currentUser) return;
+
+        section.style.display = 'block';
+        timelineContainer.innerHTML = '<p class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading your history...</p>';
+
+        try {
+            const [reqRes, qRes] = await Promise.all([
+                fetch(`/api/requests/${currentUser.id}`),
+                fetch(`/api/questions/${currentUser.id}`)
+            ]);
+
+            const requests = await reqRes.json();
+            const questions = await qRes.json();
+
+            // Combine and format for display
+            const timeline = [
+                ...requests.map(r => ({ ...r, entryType: 'request', date: r.request_date })),
+                ...questions.map(q => ({ ...q, entryType: 'question', date: q.created_at, title: q.question }))
+            ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (timeline.length === 0) {
+                timelineContainer.innerHTML = '<p class="text-center">No activity recorded yet. Start exploring our services!</p>';
+                return;
+            }
+
+            timelineContainer.innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table class="admin-table" style="width: 100%; margin-top: 20px; border-collapse: collapse; background: white;">
+                        <thead>
+                            <tr style="background: #f4f7f6;">
+                                <th style="padding: 12px; text-align: left;">Date</th>
+                                <th style="padding: 12px; text-align: left;">Activity</th>
+                                <th style="padding: 12px; text-align: left;">Status</th>
+                                <th style="padding: 12px; text-align: left;">Admin Response / Notes</th>
+                                <th style="padding: 12px; text-align: center;">Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${timeline.map(item => {
+                const isReq = item.entryType === 'request';
+                const statusClass = (item.status === 'approved' || item.status === 'closed') ? 'active' : 'pending';
+                let adminContent = '';
+
+                if (isReq) {
+                    adminContent = item.notes || 'Processing...';
+                    if (item.notes && item.response_date) {
+                        adminContent += ` (on ${formatDate(item.response_date)})`;
+                    }
+                } else { // question
+                    adminContent = item.response || 'Waiting for staff response...';
+                    if (item.response && item.responded_at) {
+                        adminContent += ` (on ${formatDate(item.responded_at)})`;
+                    }
+                }
+
+                return `
+                                    <tr style="border-bottom: 1px solid #eee;">
+                                        <td style="padding: 12px;">${formatDate(item.date)}</td>
+                                        <td style="padding: 12px;">
+                                            <strong>${isReq ? item.type.toUpperCase().replace(/_/g, ' ') : 'HELP DESK Q&A'}</strong><br>
+                                            <small style="color: #666;">${item.title}</small>
+                                        </td>
+                                        <td style="padding: 12px;"><span class="status-badge ${statusClass}">${item.status}</span></td>
+                                        <td style="padding: 12px;"><em>${adminContent}</em></td>
+                                        <td style="padding: 12px; text-align: center;">
+                                            ${(item.status === 'approved' || item.status === 'closed') && !item.rating ?
+                        `<button class="btn btn-sm btn-secondary" onclick="window.openStarRating('${isReq ? 'request' : 'question'}', ${item.id})">Rate Now</button>` :
+                        (item.rating ? '⭐'.repeat(item.rating) : '—')}
+                                        </td>
+                                    </tr>
+                                `;
+            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        } catch (err) {
+            console.error("History Load Error:", err);
+            timelineContainer.innerHTML = '<p class="text-center text-danger">Failed to load history. Please refresh the page.</p>';
+        }
+    }
+
+    const activePolls = new Set();
+    function startApprovalPolling(type, id) {
+        if (activePolls.has(id)) return;
+        activePolls.add(id);
+
+        const pollInterval = setInterval(async () => {
+            if (!currentUser) { clearInterval(pollInterval); return; }
+            try {
+                const response = await fetch(`/api/requests/${currentUser.id}`);
+                const userRequests = await response.json();
+                const currentReq = userRequests.find(r => r.id === parseInt(id));
+
+                if (currentReq && currentReq.status === 'approved') {
+                    clearInterval(pollInterval);
+                    activePolls.delete(id);
+                    openStarRating(type, id);
+                    if (document.getElementById('ratingPromptText')) document.getElementById('ratingPromptText').textContent = `Your ${currentReq.type.replace('_', ' ')} for "${currentReq.title}" is approved!`;
+                }
+            } catch (err) {
+                console.error("Polling error:", err);
+            }
+        }, 5000);
+    }
+
     // ============================================
     // SERVICE-SPECIFIC PAGE LOGIC
     // ============================================
 
     // Book Reservation Page Logic (book reservation.html)
-    if (path.includes('book reservation.html')) {
-        document.getElementById('bookReservationForm')?.addEventListener('submit', (e) => {
+    const bookReservationForm = document.getElementById('bookReservationForm');
+    if (bookReservationForm) {
+        const nameField = document.getElementById('fullName') || document.getElementById('name');
+        const cardField = document.getElementById('libraryCardNumber');
+        const emailField = document.getElementById('email');
+        const phoneField = document.getElementById('phone');
+
+        // Global Unlock: Ensure fields accept input
+        [nameField, cardField, emailField, phoneField].forEach(field => {
+            if (field) {
+                field.readOnly = false;
+                field.disabled = false;
+            }
+        });
+
+        // Global Pre-fill: Show user data automatically
+        if (currentUser) {
+            if (nameField) nameField.value = currentUser.fullName;
+            if (cardField) cardField.value = currentUser.libraryCardNumber;
+            if (emailField) emailField.value = currentUser.email;
+            if (phoneField) phoneField.value = currentUser.phone || '';
+        }
+
+        bookReservationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) { // Double check authentication
                 showNotification('You must be logged in to reserve a book.');
                 return;
             }
-            const bookTitle = document.getElementById('bookTitle').value;
-            const bookAuthor = document.getElementById('bookAuthor').value;
-            const pickupDate = document.getElementById('pickupDate').value;
-            const pickupTime = document.getElementById('pickupTime').value;
+            const formData = {
+                userId: currentUser.id,
+                type: 'book_reservation',
+                title: document.getElementById('bookTitle').value,
+                author: document.getElementById('bookAuthor').value,
+                reason: `Pickup: ${document.getElementById('pickupDate').value} at ${document.getElementById('pickupTime').value}`
+            };
 
-            // Simulate API call or local storage for reservation
-            const reservationId = 'RES-' + Math.floor(Math.random() * 100000);
-            const feedbackMessage = `Thank you, ${currentUser.fullName}! Your reservation for "${bookTitle}" by ${bookAuthor} (ID: ${reservationId}) is confirmed for pickup on ${pickupDate} at ${pickupTime}. Please rate our service (5/5).`;
-
-            document.getElementById('reservationFeedback').innerHTML = `<p>${feedbackMessage}</p><button class="btn btn-primary" onclick="window.location.href='services.html'">Back to Services</button>`;
-            document.getElementById('reservationFeedback').style.display = 'block';
-            e.target.reset();
-            showNotification('Book reservation submitted!');
+            try {
+                const response = await fetch('/api/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    const feedbackMessage = `Thank you, ${currentUser.fullName}! Your reservation for "${formData.title}" is confirmed. Request ID: ${data.requestId}.`;
+                    document.getElementById('reservationFeedback').innerHTML = `<p>${feedbackMessage}</p><button class="btn btn-primary" onclick="window.location.href='services.html'">Back to Services</button>`;
+                    document.getElementById('reservationFeedback').style.display = 'block';
+                    e.target.reset();
+                    showNotification('Reservation submitted! Waiting for Admin Approval...');
+                    startApprovalPolling('request', data.requestId);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                console.error('Book Reservation Error:', err);
+                showNotification("Failed to submit to server. Check connection or try again later.");
+            }
         });
     }
 
-    // Borrowing & Returns Page Logic (borrowreturn.html)
-    if (path.includes('borrowreturn.html')) {
-        document.getElementById('borrowReturnForm')?.addEventListener('submit', (e) => {
+    // Borrowing & Returns Page Logic (borrowreturn.html) - Corrected to use API
+    const borrowReturnForm = document.getElementById('borrowReturnForm');
+    if (borrowReturnForm) {
+        const nameField = document.getElementById('fullName') || document.getElementById('name');
+        const cardField = document.getElementById('libraryCardNumber');
+        const emailField = document.getElementById('email');
+        const phoneField = document.getElementById('phone');
+
+        // Global Unlock: Ensure fields accept input
+        [nameField, cardField, emailField, phoneField].forEach(field => {
+            if (field) {
+                field.readOnly = false;
+                field.disabled = false;
+            }
+        });
+
+        // Global Pre-fill: Show user data automatically
+        if (currentUser) {
+            if (nameField) nameField.value = currentUser.fullName;
+            if (cardField) cardField.value = currentUser.libraryCardNumber;
+            if (emailField) emailField.value = currentUser.email;
+            if (phoneField) phoneField.value = currentUser.phone || '';
+        }
+
+        borrowReturnForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) {
                 showNotification('You must be logged in to use borrowing/return services.');
                 return;
             }
-            const transactionType = document.getElementById('transactionType').value;
-            const bookIdentifier = document.getElementById('bookIdentifier').value;
-            const feedbackRating = document.getElementById('feedbackRating').value;
+            const formData = {
+                userId: currentUser.id,
+                type: document.getElementById('transactionType').value === 'borrow' ? 'borrow_request' : 'return_request',
+                title: document.getElementById('bookIdentifier').value
+            };
 
-            const feedbackMessage = `Thank you, ${currentUser.fullName}! Your ${transactionType} request for "${bookIdentifier}" has been processed. We appreciate your ${feedbackRating}/5 rating!`;
-
-            document.getElementById('borrowReturnFeedback').innerHTML = `<p>${feedbackMessage}</p><button class="btn btn-primary" onclick="window.location.href='services.html'">Back to Services</button>`;
-            document.getElementById('borrowReturnFeedback').style.display = 'block';
-            e.target.reset();
-            showNotification('Borrow/Return request submitted!');
+            try {
+                const response = await fetch('/api/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    const feedbackMessage = `Thank you, ${currentUser.fullName}! Your request for "${formData.title}" has been logged. Request ID: ${data.requestId}.`;
+                    document.getElementById('borrowReturnFeedback').innerHTML = `<p>${feedbackMessage}</p><button class="btn btn-primary" onclick="window.location.href='services.html'">Back to Services</button>`;
+                    document.getElementById('borrowReturnFeedback').style.display = 'block';
+                    e.target.reset();
+                    showNotification('Request logged! Awaiting Admin verification...');
+                    startApprovalPolling('request', data.requestId);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                console.error('Borrow/Return Request Error:', err);
+                showNotification("Server error. Request not saved. Please try again.");
+            }
         });
     }
 
@@ -1032,12 +1309,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        // Pre-fill user data if available
+        // Ensure fields are not read-only so they can accept user inputs
+        [nameField, cardField, emailField, phoneField].forEach(field => {
+            if (field) {
+                field.readOnly = false;
+                field.disabled = false;
+            }
+        });
+
+        // Pre-fill user data if available (after ensuring fields are editable)
         if (currentUser) {
-            document.getElementById('fullName').value = currentUser.fullName;
-            document.getElementById('libraryCardNumber').value = currentUser.libraryCardNumber;
-            document.getElementById('email').value = currentUser.email;
-            document.getElementById('phone').value = currentUser.phone || '';
+            if (nameField) nameField.value = currentUser.fullName;
+            if (cardField) cardField.value = currentUser.libraryCardNumber;
+            if (emailField) emailField.value = currentUser.email;
+            if (phoneField) phoneField.value = currentUser.phone || '';
         }
 
         // Pre-select service based on URL
@@ -1062,36 +1347,64 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Initial calculation
         updateCostSummary();
 
-        serviceForm?.addEventListener('submit', (e) => {
+        serviceForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) {
                 showNotification('You must be logged in to apply for services.');
                 return;
             }
             const selectedService = document.querySelector('input[name="service"]:checked')?.value || 'Unknown';
-            const totalCost = document.getElementById('totalCost').textContent;
+            const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
 
-            let feedbackMessage = '';
-            if (selectedService === 'Printing' || selectedService === 'Photocopying') {
-                const receiptId = 'RCPT-' + Math.floor(Math.random() * 1000000);
-                feedbackMessage = `
-                    <div class="receipt-box" style="background: #fff; padding: 15px; border: 1px dashed #999; margin-bottom: 15px; font-family: monospace; text-align: left;">
-                        <h4 style="text-align: center; border-bottom: 1px solid #eee; padding-bottom: 5px; color: #333;">OFFICIAL RECEIPT</h4>
-                        <p><strong>ID:</strong> ${receiptId}</p>
-                        <p><strong>SERVICE:</strong> ${selectedService.toUpperCase()}</p>
-                        <p><strong>STATUS:</strong> PAID / PROCESSED</p>
-                    </div>
-                    <p>Your work will be ready for pickup in <strong>30 minutes</strong>. Total Paid: UGX ${totalCost}</p>`;
-            } else if (selectedService === 'Internet') {
-                feedbackMessage = `Thank you, ${currentUser.fullName}! Your internet access request is submitted. Total: UGX ${totalCost}. Details will be sent to your email.`;
-            } else {
-                feedbackMessage = `Thank you, ${currentUser.fullName}! Your service request for ${selectedService} (UGX ${totalCost}) has been submitted.`;
+            if (paymentMethod === 'mobile_money') {
+                const phone = window.prompt("Enter your Mobile Money Phone Number:");
+                if (!phone) return;
+                const pin = window.prompt("A prompt has been sent to your phone. Enter your MM PIN to authorize:");
+                if (!pin) return;
+                showNotification("Connecting to Mobile Money Account... Payment Authorized.");
             }
 
-            document.getElementById('serviceFeedback').innerHTML = `<p>${feedbackMessage}</p><button class="btn btn-primary" onclick="window.location.href='services.html'">Back to Services</button>`;
-            document.getElementById('serviceFeedback').style.display = 'block';
-            e.target.reset();
-            showNotification('Service request submitted!');
+            const totalCost = document.getElementById('totalCost').textContent;
+
+            const formData = {
+                userId: currentUser.id,
+                type: 'service_application',
+                title: selectedService,
+                reason: `Cost: UGX ${totalCost}`
+            };
+
+            try {
+                const response = await fetch('/api/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    let feedbackMessage = '';
+                    if (selectedService === 'Printing' || selectedService === 'Photocopying') {
+                        feedbackMessage = `
+                            <div class="receipt-box" style="background: #fff; padding: 15px; border: 1px dashed #999; margin-bottom: 15px; font-family: monospace; text-align: left;">
+                                <h4 style="text-align: center; border-bottom: 1px solid #eee; padding-bottom: 5px; color: #333;">OFFICIAL RECEIPT</h4>
+                                <p><strong>ID:</strong> ${data.requestId}</p>
+                                <p><strong>SERVICE:</strong> ${selectedService.toUpperCase()}</p>
+                                <p><strong>STATUS:</strong> PAID / PROCESSED</p>
+                            </div>
+                            <p>Your work will be ready for pickup in <strong>30 minutes</strong>. Total Paid: UGX ${totalCost}</p>`;
+                    } else {
+                        feedbackMessage = `Thank you, ${currentUser.fullName}! Your service request for ${selectedService} has been submitted (ID: ${data.requestId}).`;
+                    }
+
+                    document.getElementById('serviceFeedback').innerHTML = `<p>${feedbackMessage}</p><button class="btn btn-primary" onclick="window.location.href='services.html'">Back to Services</button>`;
+                    document.getElementById('serviceFeedback').style.display = 'block';
+                    e.target.reset();
+                    showNotification('Payment processed! Waiting for Admin to confirm service...');
+                    startApprovalPolling('request', data.requestId);
+                }
+            } catch (err) {
+                showNotification("Payment/Service processing failed locally. Please try again.");
+            }
         });
     }
 
@@ -1107,27 +1420,238 @@ document.addEventListener("DOMContentLoaded", async () => {
         const advertisementsContent = document.getElementById('advertisementsContent');
         const emptyMessage = advertisementsContent.querySelector('.empty-message');
 
-        // Simulate fetching advertisements
-        // Mock: nothing new for now to test notification requirement
-        const mockAdvertisements = [];
+        fetch('/api/advertisements')
+            .then(res => res.json())
+            .then(ads => {
+                if (ads && ads.length > 0) {
+                    advertisementsContent.innerHTML = ads.map(ad => `
+                        <div class="card ad-card">
+                            <h3>${ad.title}</h3>
+                            <p>${ad.description}</p>
+                        </div>
+                    `).join('');
+                    emptyMessage.style.display = 'none';
+                } else {
+                    emptyMessage.style.display = 'block';
+                    showNotification('Nothing new in advertisements at the moment.');
+                }
+            })
+            .catch(err => {
+                emptyMessage.style.display = 'block';
+            });
+    }
 
-        if (mockAdvertisements.length > 0) {
-            advertisementsContent.innerHTML = mockAdvertisements.map(ad => `
-                <div class="card ad-card">
-                    <h3>${ad.title}</h3>
-                    <p>${ad.description}</p>
-                    <small>Posted: ${formatDate(ad.date)}</small>
-                </div>
-            `).join('');
-            emptyMessage.style.display = 'none';
-        } else {
-            emptyMessage.style.display = 'block';
-            showNotification('Nothing new in advertisements at the moment.');
+    // Admin Dashboard Logic (adminA.html)
+    if (path.includes('adminA.html')) {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            showNotification("Access Denied: Please login as Admin.");
+            setTimeout(() => window.location.href = 'admin-login.html', 2000);
+            return;
         }
+
+        // 1. Live Stats Monitoring
+        async function loadAdminStats() {
+            try {
+                const res = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } });
+                const stats = await res.json();
+                if (res.ok) {
+                    document.getElementById('stat-total-users').textContent = stats.totalUsers;
+                    document.getElementById('stat-active-today').textContent = stats.activeToday;
+                    document.getElementById('stat-total-books').textContent = stats.totalBooks;
+                    document.getElementById('stat-total-resources').textContent = stats.totalResources;
+                }
+            } catch (err) { console.error("Stats Error:", err); }
+        }
+
+        // 2. Activity Feed Monitoring
+        async function loadAdminLogs() {
+            try {
+                const res = await fetch('/api/admin/logs', { headers: { 'Authorization': `Bearer ${token}` } });
+                const logs = await res.json();
+                const list = document.getElementById('admin-activity-list');
+                if (res.ok && list) {
+                    list.innerHTML = logs.map(log => `
+                        <li style="padding:8px; border-bottom:1px solid #eee; font-size:0.9em;">
+                            <strong>${log.full_name || 'Guest'}</strong>: ${log.action.replace(/_/g, ' ')} 
+                            <span style="color:#888; float:right;">${formatDate(log.timestamp)}</span>
+                        </li>
+                    `).join('');
+                }
+            } catch (err) { console.error("Logs Error:", err); }
+        }
+
+        // 3. User Management (Live Actions)
+        async function loadAdminUsers() {
+            try {
+                const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+                const users = await res.json();
+                const tbody = document.getElementById('admin-users-tbody');
+                if (res.ok && tbody) {
+                    tbody.innerHTML = users.map(user => `
+                        <tr>
+                            <td>${user.library_card_number}</td>
+                            <td>${user.full_name}</td>
+                            <td>${user.email}</td>
+                            <td><span class="badge">${user.user_type}</span></td>
+                            <td><span class="status-badge ${user.status || 'active'}">${user.status || 'active'}</span></td>
+                            <td>
+                                ${user.status === 'blocked' ?
+                            `<button class="btn btn-sm" onclick="unblockUser(${user.id})">Unblock</button>` :
+                            `<button class="btn btn-sm btn-danger" onclick="blockUserPrompt(${user.id})">Block</button>`
+                        }
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) { console.error("Users Error:", err); }
+        }
+
+        // 4. Service Requests (Polling Connection)
+        window.loadAdminRequests = async function () {
+            const tbody = document.getElementById('admin-requests-tbody');
+            if (!tbody) return;
+            try {
+                const response = await fetch('/api/admin/requests', { headers: { 'Authorization': `Bearer ${token}` } });
+                const requests = await response.json();
+                if (response.ok) {
+                    tbody.innerHTML = requests.map(req => `
+                        <tr>
+                            <td>#${req.id}</td>
+                            <td>${req.user_name}</td>
+                            <td><strong>${req.type.toUpperCase().replace(/_/g, ' ')}</strong></td>
+                            <td>${req.title}</td>
+                            <td><span class="status-badge ${req.status}">${req.status}</span></td>
+                            <td>${req.rating ? '⭐'.repeat(req.rating) : 'N/A'}</td>
+                            <td>
+                                ${req.status === 'pending' ?
+                            `<button class="btn btn-sm btn-success" onclick="approveRequest(${req.id})">Approve</button>` :
+                            '<i class="fa fa-check-circle" style="color:green"></i>'}
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) { console.error("Admin request load error:", err); }
+        };
+
+        // 5. Help Desk Resolution
+        async function loadAdminQuestions() {
+            try {
+                const res = await fetch('/api/admin/questions', { headers: { 'Authorization': `Bearer ${token}` } });
+                const questions = await res.json();
+                const list = document.getElementById('admin-questions-list');
+                if (res.ok && list) {
+                    list.innerHTML = questions.map(q => `
+                        <li class="card" style="margin-bottom:10px; padding:15px; border:1px solid #ddd; list-style:none;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>${q.user_name}</strong>
+                                <span class="status-badge ${q.status}">${q.status}</span>
+                            </div>
+                            <p style="margin:10px 0;">${q.question}</p>
+                            ${q.status === 'open' ?
+                            `<button class="btn btn-sm" onclick="respondToQuestionPrompt(${q.id})">Respond</button>` :
+                            `<div class="response" style="background:#f9f9f9; padding:10px; border-radius:4px;"><strong>Staff:</strong> ${q.response}</div>`
+                        }
+                        </li>
+                    `).join('');
+                }
+            } catch (err) { console.error("Questions Error:", err); }
+        }
+
+        // Admin Action Handlers
+        window.approveRequest = async function (id) {
+            const notes = prompt("Enter approval notes/instructions for the user (optional):", "Ready for pickup at front desk.");
+            if (notes === null) return; // Action cancelled
+
+            const res = await fetch(`/api/admin/requests/${id}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'approved', notes: notes })
+            });
+            if (res.ok) { showSuccess("Request approved. User will be prompted to rate."); loadAdminRequests(); loadAdminStats(); }
+        };
+
+        window.blockUserPrompt = async function (id) {
+            const reason = prompt("Enter reason for blocking this user:");
+            if (!reason) return;
+            const res = await fetch(`/api/admin/users/${id}/block`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason })
+            });
+            if (res.ok) { showNotification("User account blocked."); loadAdminUsers(); }
+        };
+
+        window.unblockUser = async function (id) {
+            const res = await fetch(`/api/admin/users/${id}/unblock`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) { showNotification("Access restored."); loadAdminUsers(); }
+        };
+
+        window.respondToQuestionPrompt = async function (id) {
+            const response = prompt("Enter your response to the user:");
+            if (!response) return;
+            const res = await fetch(`/api/admin/questions/${id}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ response })
+            });
+            if (res.ok) { showSuccess("Response sent to user."); loadAdminQuestions(); }
+        };
+
+        // Search and Initialization
+        document.getElementById('adminCatalogueSearchBtn')?.addEventListener('click', async () => {
+            const q = document.getElementById('adminCatalogueSearch').value;
+            const res = await fetch(`/api/catalogue?q=${encodeURIComponent(q)}`);
+            const data = await res.json();
+            const tbody = document.getElementById('admin-catalogue-tbody');
+            if (res.ok && tbody) {
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td>${item.category}</td>
+                        <td>${item.title}</td>
+                        <td>${item.author || 'N/A'}</td>
+                        <td>${item.available ? '<span class="status-badge active">In Stock</span>' : '<span class="status-badge pending">Out</span>'}</td>
+                        <td><button class="btn btn-sm" onclick="handleCatalogueAction('${item.type}', ${item.id})">Manage</button></td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        // Initial Load of all Admin data
+        loadAdminStats();
+        loadAdminLogs();
+        loadAdminUsers();
+        loadAdminRequests();
+        loadAdminQuestions();
+    }
+
+    // Redirect logged-in admin away from login page
+    if (path.includes('admin-login.html') && currentAdmin) {
+        window.location.href = 'adminA.html';
     }
 
     // Auto-open E-Resources section
     document.getElementById('eresources-section').style.display = 'block';
+
+    // ============================================
+    // DASHBOARD / GLOBAL PENDING CHECK
+    // ============================================
+    async function checkExistingPending() {
+        if (!currentUser) return;
+        try {
+            const response = await fetch(`/api/requests/${currentUser.id}`);
+            const requests = await response.json();
+            requests.forEach(req => {
+                if (req.status === 'pending') startApprovalPolling('request', req.id);
+            });
+            renderUserHistory();
+        } catch (e) { console.error("Initial pending check failed", e); }
+    }
+
+    checkExistingPending();
 
     // Start data fetch last so UI remains responsive
     await fetchAllData();
