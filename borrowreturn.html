@@ -11,8 +11,74 @@
 
 <body>
     <header>
-        <!-- Header content from index.html -->
+        <div class="logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
+        </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li><a href="services.html" class="active">Services</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="collections.html">Special Collections</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="search-login">
+            <div class="search-wrapper">
+                <input type="text" id="globalSearch" placeholder="Search catalogue...">
+                <button class="btn search-btn"><i class="fa fa-search"></i></button>
+            </div>
+            <div id="auth-header-container">
+                <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
+            </div>
+        </div>
     </header>
+    <!-- Modals -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-sign-in-alt"></i> Library Login</h2>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-user-plus"></i> Library Registration</h2>
+            </div>
+            <form id="registerForm">
+                <div class="register-form-scroll">
+                    <div class="form-group"><label for="regFullName">Full Name *</label><input type="text"
+                            id="regFullName" required></div>
+                    <div class="form-group"><label for="regEmail">Email Address *</label><input type="email"
+                            id="regEmail" required></div>
+                    <div class="form-group"><label for="regPassword">Password *</label><input type="password"
+                            id="regPassword" required></div>
+                    <div class="form-group"><label for="regPhone">Phone Number *</label><input type="tel" id="regPhone"
+                            required></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register & Get Library Card</button>
+                <p class="form-footer">Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+            </form>
+        </div>
+    </div>
     <main>
         <section class="request-form-page">
             <h2><i class="fa fa-exchange-alt"></i> Borrowing & Returns</h2>
@@ -29,10 +95,6 @@
                     <label for="bookIdentifier">Book Title or ID *</label>
                     <input type="text" id="bookIdentifier" class="form-control" required
                         placeholder="Enter book title or library ID">
-                </div>
-                <div class="form-group">
-                    <label for="feedbackRating">Rate our service (1-5) *</label>
-                    <input type="number" id="feedbackRating" class="form-control" min="1" max="5" value="5" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
                 <button type="reset" class="btn btn-secondary">Cancel</button>
