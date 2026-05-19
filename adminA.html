@@ -13,35 +13,59 @@
     <!-- Header -->
     <header>
         <div class="logo">
-            <img src="log.jpeg" alt="Library Logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
         </div>
         <nav class="nav">
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="books.html">Books & Resources</a></li>
-                <li class="nav-item-dropdown">
-                    <a href="#" class="active">Admin <i class="fa fa-caret-down"></i></a>
-                    <ul class="nav-dropdown-menu">
-                        <li><a href="adminA.html">Manage Users</a></li>
-                        <li><a href="admin-resources.html">Manage Resources</a></li>
-                    </ul>
-                </li>
+                <li><a href="adminA.html" class="active">User Management</a></li>
+                <li><a href="admin-resources.html">Resource Management</a></li>
+                <li><a href="index.html">Main Site</a></li>
             </ul>
         </nav>
+        <div class="search-login">
+            <div id="auth-header-container"></div>
+        </div>
     </header>
 
     <!-- Main Content -->
     <main>
         <section class="admin-panel">
-            <h2><i class="fa fa-user-shield"></i> Admin Panel</h2>
+            <h2><i class="fa fa-user-shield"></i> User Management Dashboard</h2>
+
+            <!-- Monitor Activity (Dynamic Stats) -->
+            <div class="admin-section">
+                <h3><i class="fa fa-chart-line"></i> Monitor Activity</h3>
+                <div class="stats-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div class="card"
+                        style="padding: 15px; background: #fff; border-left: 4px solid var(--secondary-blue);">
+                        <p><strong>Total Users:</strong> <span id="stat-total-users">Loading...</span></p>
+                    </div>
+                    <div class="card"
+                        style="padding: 15px; background: #fff; border-left: 4px solid var(--accent-green);">
+                        <p><strong>Active Today:</strong> <span id="stat-active-today">Loading...</span></p>
+                    </div>
+                    <div class="card"
+                        style="padding: 15px; background: #fff; border-left: 4px solid var(--accent-gold);">
+                        <p><strong>Collection Size:</strong> <span id="stat-total-books">Loading...</span></p>
+                    </div>
+                    <div class="card"
+                        style="padding: 15px; background: #fff; border-left: 4px solid var(--primary-blue);">
+                        <p><strong>Digital Assets:</strong> <span id="stat-total-resources">Loading...</span></p>
+                    </div>
+                </div>
+                <h4>Recent Activities</h4>
+                <ul id="admin-activity-list" style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto;">
+                </ul>
+            </div>
 
             <!-- User List -->
             <div class="admin-section">
-                <h3><i class="fa fa-users"></i> User List</h3>
+                <h3><i class="fa fa-users"></i> Registered Users</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Library Card</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Role</th>
@@ -49,102 +73,122 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="admin-users-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- User Requests -->
+            <div class="admin-section">
+                <h3><i class="fa fa-bell"></i> Service Requests</h3>
+                <table>
+                    <thead>
                         <tr>
-                            <td>U001</td>
-                            <td>John Musoke</td>
-                            <td>john.musoke@bugema.ac.ug</td>
-                            <td>Student</td>
-                            <td>Active</td>
-                            <td><button class="btn">Block</button></td>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
                         </tr>
+                    </thead>
+                    <tbody id="admin-requests-tbody">
                         <tr>
-                            <td>U002</td>
-                            <td>Maria Nankya</td>
-                            <td>maria.nankya@bugema.ac.ug</td>
-                            <td>Staff</td>
-                            <td>Active</td>
-                            <td><button class="btn">Block</button></td>
-                        </tr>
-                        <tr>
-                            <td>U003</td>
-                            <td>Peter Ouma</td>
-                            <td>peter.ouma@bugema.ac.ug</td>
-                            <td>Student</td>
-                            <td>Active</td>
-                            <td><button class="btn">Block</button></td>
-                        </tr>
-                        <tr>
-                            <td>U004</td>
-                            <td>Grace Asim</td>
-                            <td>grace.asim@bugema.ac.ug</td>
-                            <td>Staff</td>
-                            <td class="blocked">Blocked</td>
-                            <td><button class="btn">Unblock</button></td>
+                            <td colspan="7" style="text-align:center;">Loading requests...</td>
                         </tr>
                     </tbody>
                 </table>
-                <button class="btn">Block Selected Accounts</button>
             </div>
 
-            <!-- New User -->
+            <!-- Help Desk Questions -->
             <div class="admin-section">
-                <h3><i class="fa fa-user-plus"></i> New User</h3>
-                <form id="newUserForm">
-                    <label>Full Name*</label><input type="text" required>
-                    <label>Email*</label><input type="email" required>
-                    <label>Role*</label>
-                    <select required>
-                        <option value="">Select Role</option>
-                        <option>Student</option>
-                        <option>Staff</option>
-                        <option>Admin</option>
-                    </select>
-                    <label>Password*</label><input type="password" required>
-                    <button type="submit" class="btn">Add User</button>
-                </form>
+                <h3><i class="fa fa-question-circle"></i> Help Desk Questions</h3>
+                <ul id="admin-questions-list"></ul>
             </div>
 
-            <!-- Monitor Activity -->
+            <!-- Library Catalogue Overview -->
             <div class="admin-section">
-                <h3><i class="fa fa-chart-line"></i> Monitor Activity</h3>
-                <p><strong>Total Users:</strong> 1,245</p>
-                <p><strong>Active Today:</strong> 156</p>
-                <p><strong>Logins (This Week):</strong> 723</p>
-                <p><strong>Resources:</strong> 2,340</p>
-                <h4>Recent Activities</h4>
-                <ul>
-                    <li>John Musoke logged in – 10:15 AM</li>
-                    <li>Maria Nankya borrowed a book – 09:45 AM</li>
-                    <li>Peter Ouma accessed e-resource – 09:30 AM</li>
-                    <li>Grace Asim logged in – 09:10 AM</li>
-                </ul>
-                <button class="btn">View All Activity</button>
+                <h3><i class="fa fa-book-open"></i> Library Catalogue Explorer</h3>
+                <p>Search and oversee all physical and electronic resources from a single interface.</p>
+                <div class="search-bar" style="margin: 15px 0; display: flex; gap: 10px;">
+                    <input type="text" id="adminCatalogueSearch" placeholder="Search by title, author, or category..."
+                        style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ccc;">
+                    <button class="btn" id="adminCatalogueSearchBtn"><i class="fa fa-search"></i> Search
+                        Catalogue</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Author/Provider</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-catalogue-tbody">
+                        <tr>
+                            <td colspan="5" style="text-align:center;">Use the search bar above to explore the inventory
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Block Accounts -->
-            <div class="admin-section">
-                <h3><i class="fa fa-ban"></i> Block Accounts</h3>
-                <form id="blockForm">
-                    <label>User ID or Email*</label><input type="text" required>
-                    <label>Reason*</label>
-                    <select required>
-                        <option value="">Select Reason</option>
-                        <option>Violation of Policies</option>
-                        <option>Suspicious Activity</option>
-                        <option>Requested by User</option>
-                    </select>
-                    <label>Notes (Optional)</label><textarea></textarea>
-                    <button type="submit" class="btn">Block Account</button>
-                </form>
+            <!-- Admin Actions: Add & Block -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="admin-section">
+                    <h3><i class="fa fa-user-plus"></i> Create New User</h3>
+                    <form id="newUserForm">
+                        <label>Full Name*</label><input type="text" id="adminNewUserName" required>
+                        <label>Email*</label><input type="email" id="adminNewUserEmail" required>
+                        <label>Role*</label>
+                        <select id="adminNewUserRole" required>
+                            <option value="student">Student</option>
+                            <option value="staff">Staff</option>
+                            <option value="faculty">Admin</option>
+                        </select>
+                        <label>Initial Password*</label><input type="password" id="adminNewUserPass" required>
+                        <button type="submit" class="btn btn-primary btn-block">Add User</button>
+                    </form>
+                </div>
+                <div class="admin-section">
+                    <h3><i class="fa fa-ban"></i> Block Account</h3>
+                    <form id="blockForm">
+                        <label>Card Number or Email*</label><input type="text" id="blockUserIdentifier" required>
+                        <label>Reason*</label>
+                        <select id="blockUserReason" required>
+                            <option value="Policy Violation">Policy Violation</option>
+                            <option value="Suspicious Activity">Suspicious Activity</option>
+                        </select>
+                        <button type="submit" class="btn btn-danger btn-block">Block Access</button>
+                    </form>
+                </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2025 Bugema University. All rights reserved.</p>
-    </footer>
+    <!-- Modals for Feedback -->
+    <div id="successModal" class="modal">
+        <div class="modal-content success-content">
+            <i class="fa fa-check-circle"></i>
+            <h3>Success!</h3>
+            <p id="successMessage"></p>
+            <button class="btn btn-primary" id="closeSuccessBtn">Close</button>
+        </div>
+    </div>
+
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa fa-bell"></i> Notification</h3>
+            </div>
+            <div class="modal-body">
+                <p id="notificationMessage"></p>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" id="closeNotificationBtn">OK</button></div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
