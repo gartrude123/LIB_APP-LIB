@@ -22,6 +22,7 @@
                 <li><a href="about.html">About Us</a></li>
                 <li><a href="collections.html">Special Collections</a></li>
                 <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="adminA.html">Admin Panel</a>
             </ul>
         </nav>
         <div class="search-login">
@@ -136,12 +137,13 @@
             </div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginCardNumber">Library Card Number *</label>
-                    <input type="text" id="loginCardNumber" required placeholder="e.g., LIB-123456" maxlength="12">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
                 </div>
                 <div class="form-group">
-                    <label for="loginEmail">Email Address *</label>
-                    <input type="email" id="loginEmail" required placeholder="Enter your registered email">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
                 <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
