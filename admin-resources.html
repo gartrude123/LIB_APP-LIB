@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Resource Management</title>
+    <title>Resource Management - Bugema University Library</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -13,70 +13,69 @@
     <!-- Header -->
     <header>
         <div class="logo">
-            <img src="log.jpeg" alt="Library Logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
         </div>
         <nav class="nav">
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="books.html">Books & Resources</a></li>
-                <li class="nav-item-dropdown">
-                    <a href="#" class="active">Admin <i class="fa fa-caret-down"></i></a>
-                    <ul class="nav-dropdown-menu">
-                        <li><a href="adminA.html">Manage Users</a></li>
-                        <li><a href="admin-resources.html">Manage Resources</a></li>
-                    </ul>
-                </li>
+                <li><a href="adminA.html">User Management</a></li>
+                <li><a href="admin-resources.html" class="active">Resource Management</a></li>
+                <li><a href="index.html">Main Site</a></li>
             </ul>
         </nav>
+        <div class="search-login">
+            <div id="auth-header-container"></div>
+        </div>
     </header>
 
     <!-- Main Content -->
     <main>
         <section class="admin-panel">
-            <h2><i class="fa fa-book"></i> Resource Management</h2>
+            <h2><i class="fa fa-book-medical"></i> Resource Management</h2>
 
-            <!-- Add New Book -->
+            <!-- Summary Stats -->
             <div class="admin-section">
-                <h3><i class="fa fa-plus"></i> Add New Book</h3>
-                <form id="addBookForm">
-                    <label>Title*</label><input type="text" required>
-                    <label>Author*</label><input type="text" required>
-                    <label>ISBN*</label><input type="text" required>
-                    <label>Category*</label>
-                    <select required>
-                        <option value="">Select Category</option>
-                        <option>Management</option>
-                        <option>Research</option>
-                        <option>Science</option>
-                        <option>Technology</option>
-                    </select>
-                    <label>Quantity*</label><input type="number" required>
-                    <button type="submit" class="btn">Add Book</button>
-                </form>
+                <div class="stats-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div class="card"
+                        style="padding: 15px; background: #fff; border-left: 4px solid var(--accent-gold);">
+                        <p><strong>Total Books:</strong> <span id="stat-total-books">Loading...</span></p>
+                    </div>
+                    <div class="card"
+                        style="padding: 15px; background: #fff; border-left: 4px solid var(--primary-blue);">
+                        <p><strong>E-Resources:</strong> <span id="stat-total-resources">Loading...</span></p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Add E-Resource -->
-            <div class="admin-section">
-                <h3><i class="fa fa-plus"></i> Add E-Resource</h3>
-                <form id="addResourceForm">
-                    <label>Resource Title*</label><input type="text" required>
-                    <label>Reason*</label><input type="text" required>
-                    <label>Type*</label>
-                    <select required>
-                        <option value="">Select Type</option>
-                        <option>Database</option>
-                        <option>Journal</option>
-                        <option>E-Book</option>
-                    </select>
-                    <label>URL*</label><input type="url" required>
-                    <label>Provider*</label><input type="text" required>
-                    <button type="submit" class="btn">Add E-Resource</button>
-                </form>
+            <!-- Quick Search Filter -->
+            <div class="admin-section" style="background: #f0f4f8; border-radius: 8px; padding: 20px;">
+                <h3><i class="fa fa-filter"></i> Inventory Quick Filter</h3>
+                <input type="text" id="adminResourceFilter"
+                    placeholder="Type to filter the tables below by title, author, or category..."
+                    style="width:100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 1em;">
             </div>
 
-            <!-- Manage Collections -->
+            <!-- Physical Books -->
             <div class="admin-section">
-                <h3><i class="fa fa-tasks"></i> Manage Collections</h3>
+                <h3><i class="fa fa-book"></i> Physical Book Collection</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-books-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- E-Resources -->
+            <div class="admin-section">
+                <h3><i class="fa fa-globe"></i> Electronic Resources</h3>
                 <table>
                     <thead>
                         <tr>
@@ -88,58 +87,73 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>B001</td>
-                            <td>Principles of Management</td>
-                            <td>Book</td>
-                            <td>Management</td>
-                            <td>Available</td>
-                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
-                        </tr>
-                        <tr>
-                            <td>B002</td>
-                            <td>Research Methods</td>
-                            <td>Book</td>
-                            <td>Research</td>
-                            <td>Available</td>
-                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
-                        </tr>
-                        <tr>
-                            <td>E001</td>
-                            <td>JSTOR Database</td>
-                            <td>E-Resource</td>
-                            <td>Journals</td>
-                            <td>Active</td>
-                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
-                        </tr>
-                        <tr>
-                            <td>E002</td>
-                            <td>ScienceDirect</td>
-                            <td>E-Resource</td>
-                            <td>Journals</td>
-                            <td>Active</td>
-                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
-                        </tr>
-                        <tr>
-                            <td>P001</td>
-                            <td>Bugema University Journal</td>
-                            <td>Publication</td>
-                            <td>Journal</td>
-                            <td>Published</td>
-                            <td><button class="btn edit">Edit</button> <button class="btn delete">Delete</button></td>
-                        </tr>
-                    </tbody>
+                    <tbody id="admin-resources-tbody"></tbody>
                 </table>
-                <button class="btn">View All Collections</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="admin-section">
+                    <h3><i class="fa fa-plus-circle"></i> Add Physical Book</h3>
+                    <form id="addBookForm">
+                        <label>Title*</label><input type="text" id="adminBookTitle" required>
+                        <label>Author*</label><input type="text" id="adminBookAuthor" required>
+                        <label>ISBN</label><input type="text" id="adminBookIsbn">
+                        <label>Publisher</label><input type="text" id="adminBookPublisher">
+                        <label>Year</label><input type="text" id="adminBookYear">
+                        <label>Category</label>
+                        <select id="adminBookCategory" required>
+                            <option value="academic">Academic</option>
+                            <option value="religious">Religious</option>
+                            <option value="political">Political</option>
+                            <option value="historical">Historical</option>
+                            <option value="literature">Literature</option>
+                        </select>
+                        <label>Quantity*</label><input type="number" id="adminBookQuantity" value="1" min="1" required>
+                        <button type="submit" class="btn btn-primary btn-block">Add Book</button>
+                    </form>
+                </div>
+
+                <div class="admin-section">
+                    <h3><i class="fa fa-file-export"></i> Add E-Resource</h3>
+                    <form id="addResourceForm">
+                        <label>Title*</label><input type="text" id="resTitle" required>
+                        <label>Type*</label>
+                        <select id="resType" required>
+                            <option value="ebook">E-Book</option>
+                            <option value="journal">Journal</option>
+                            <option value="database">Database</option>
+                            <option value="guide">Research Guide</option>
+                            <option value="dictionary">Dictionary</option>
+                            <option value="encyclopedia">Encyclopedia</option>
+                        </select>
+                        <label>Access URL*</label><input type="url" id="resUrl" required>
+                        <label>Provider/Author</label><input type="text" id="resProvider">
+                        <label>Category</label><input type="text" id="resCategory">
+                        <label>Description</label><textarea id="resDesc"></textarea>
+                        <button type="submit" class="btn btn-primary btn-block">Add Resource</button>
+                    </form>
+                </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2025 Bugema University. All rights reserved.</p>
-    </footer>
+    <!-- Edit Resource Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeEditModal">&times;</span>
+            <div class="modal-header">
+                <h2 id="editModalTitle">Edit Resource</h2>
+            </div>
+            <form id="editResourceForm">
+                <input type="hidden" id="editItemId">
+                <input type="hidden" id="editItemType">
+                <div id="editFormFields">
+                    <!-- Dynamic fields based on type -->
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+            </form>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
