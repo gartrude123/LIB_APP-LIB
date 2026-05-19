@@ -8,40 +8,46 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Global Layout Fixes for Button Visibility */
+        main {
+            padding-bottom: 80px;
+            /* Space to prevent footer overlap */
+            min-height: 60vh;
+        }
+
+        .modal {
+            overflow-y: auto !important;
+            /* Allow the modal background to scroll */
+            padding: 20px 0;
+        }
+
+        .modal-content {
+            max-height: none !important;
+            /* Ensure content determines height */
+            margin-bottom: 40px;
+            /* Buffer at the bottom */
+        }
+    </style>
 </head>
 
 <body>
     <!-- Header -->
     <header>
         <div class="logo">
-            <img src="log.jpeg" alt="Library Logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
         </div>
         <nav class="nav">
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="books.html">Books & Resources</a></li>
                 <li><a href="services.html">Services</a></li>
-                <li><a href="about.html">About Us</a></li>
-                <li><a href="collections.html">Special Collections</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
-                <li class="nav-item-dropdown">
-                    <a href="#">Admin <i class="fa fa-caret-down"></i></a>
-                    <ul class="nav-dropdown-menu">
-                        <li><a href="adminA.html">Manage Users</a></li>
-                        <li><a href="admin-resources.html">Manage Resources</a></li>
-                    </ul>
-                </li>
+                <li><a href="about.html">About Us</a>
+                <li><a href="collections.html">Special Collections</a>
+                <li><a href="contact.html">Contact Us</a>
+                <li><a href="admin-login.html">Admin Panel</a>
             </ul>
         </nav>
-        <div class="search-login">
-            <div class="search-wrapper">
-                <input type="text" id="globalSearch" placeholder="Search catalogue, ebooks, journals...">
-                <button class="btn search-btn"><i class="fa fa-search"></i></button>
-            </div>
-            <div id="auth-header-container">
-                <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
-            </div>
-        </div>
     </header>
 
     <!-- Main Content -->
@@ -55,6 +61,13 @@
                 <a href="books.html" class="btn btn-primary">Explore Resources</a>
                 <a href="services.html" class="btn btn-secondary">View Services</a>
             </div>
+        </section>
+
+        <!-- Activity Timeline Section: This is where users see Approval -> Rating -> Exit -->
+        <section id="user-activity-timeline-section" class="container"
+            style="display:none; margin-top: 40px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <h2 id="user-activity-timeline-title"><i class="fa fa-history"></i> Your Activity Timeline</h2>
+            <div id="user-activity-timeline"></div>
         </section>
     </main>
 
@@ -131,12 +144,13 @@
             </div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginCardNumber">Library Card Number *</label>
-                    <input type="text" id="loginCardNumber" required placeholder="e.g., LIB-123456" maxlength="12">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
                 </div>
                 <div class="form-group">
-                    <label for="loginEmail">Email Address *</label>
-                    <input type="email" id="loginEmail" required placeholder="Enter your registered email">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
                 <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
