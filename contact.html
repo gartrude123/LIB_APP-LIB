@@ -12,7 +12,7 @@
 <body>
     <header>
         <div class="logo">
-            <img src="log.jpeg" alt="Library Logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
         </div>
         <nav class="nav">
             <ul>
@@ -21,41 +21,57 @@
                 <li><a href="services.html">Services</a></li>
                 <li><a href="about.html">About Us</a></li>
                 <li><a href="collections.html">Special Collections</a></li>
-                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="contact.html" class="active">Contact Us</a></li>
+                <li><a href="adminA.html">Admin Panel</a></li>
             </ul>
         </nav>
-        <div id="auth-header-container">
-            <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
-        </div>
+        <div class="search-login">
+            <div id="auth-header-container">
+                <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
+            </div>
         </div>
     </header>
+
     <main>
-        <section class="contact">
+        <section class="contact-section container" style="margin: 60px auto; max-width: 800px; text-align: center;">
             <h2><i class="fa fa-envelope"></i> Contact Us</h2>
-            <form class="contact-form">
-                <label>Full Name*</label>
-                <input type="text" required>
-                <label>Email*</label>
-                <input type="email" required>
-                <label>Message*</label>
-                <textarea required></textarea>
-                <div class="checkboxes">
-                    <label><input type="checkbox"> Phone</label>
-                    <label><input type="checkbox"> Email</label>
-                    <label><input type="checkbox"> WhatsApp / Chat</label>
+            <p style="margin-bottom: 30px;">Have a question? Send us a message or reach out via our contact details.</p>
+
+            <form class="contact-form"
+                style="background: white; padding: 30px; border-radius: 12px; box-shadow: var(--shadow); text-align: left;">
+                <div class="form-group">
+                    <label>Your Message*</label>
+                    <textarea required placeholder="How can the library help you?"
+                        style="min-height: 150px;"></textarea>
                 </div>
-                <button type="submit" class="btn">Send Message</button>
+                <div class="form-group">
+                    <label>Preferred Contact Method:</label>
+                    <div style="display: flex; gap: 20px; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;"><input
+                                type="checkbox"> Phone</label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;"><input
+                                type="checkbox"> Email</label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;"><input
+                                type="checkbox"> WhatsApp</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Send Message</button>
             </form>
 
-            <div class="contact-info">
-                <h3>Our Contact Information</h3>
-                <p><i class="fa fa-phone"></i> <a href="tel:+256788622619" target="_blank"
-                        style="color: inherit; text-decoration: none;">+256 788 622 619</a> (<a
-                        href="https://wa.me/256788622619" target="_blank"
-                        style="color: inherit; text-decoration: none;">WhatsApp</a>)</p>
-                <p><i class="fa fa-envelope"></i> library@bugemauniv.ac.ug</p>
-                <p><i class="fa fa-comments"></i> WhatsApp / Live Chat</p>
-                <p><i class="fa fa-map-marker-alt"></i> Bugema University, P.O. Box 6529, Kampala, Uganda</p>
+            <div class="contact-info"
+                style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div class="card"
+                    style="padding: 20px; background: white; border-radius: 8px; box-shadow: var(--shadow); text-align: center;">
+                    <i class="fa fa-phone"
+                        style="font-size: 2em; color: var(--secondary-blue); margin-bottom: 10px;"></i>
+                    <p>+256 788 622 619</p>
+                </div>
+                <div class="card"
+                    style="padding: 20px; background: white; border-radius: 8px; box-shadow: var(--shadow); text-align: center;">
+                    <i class="fab fa-whatsapp" style="font-size: 2em; color: #25D366; margin-bottom: 10px;"></i>
+                    <p><a href="https://wa.me/256788622619" target="_blank"
+                            style="text-decoration: none; color: inherit;">WhatsApp Chat</a></p>
+                </div>
             </div>
         </section>
     </main>
@@ -133,15 +149,17 @@
             </div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginCardNumber">Library Card Number *</label>
-                    <input type="text" id="loginCardNumber" required placeholder="e.g., LIB-123456" maxlength="12">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
                 </div>
                 <div class="form-group">
-                    <label for="loginEmail">Email Address *</label>
-                    <input type="email" id="loginEmail" required placeholder="Enter your registered email">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
-                <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
+                <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register
+                        here</a></p>
             </form>
         </div>
     </div>
@@ -178,7 +196,8 @@
                             id="regDepartment" placeholder="e.g., Computer Science"></div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Register & Get Library Card</button>
-                <p class="form-footer">Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+                <p class="form-footer">Already have an account? <a href="#" id="switchToLogin">Login
+                        here</a></p>
             </form>
         </div>
     </div>
@@ -200,7 +219,8 @@
             <div class="modal-body">
                 <p id="notificationMessage"></p>
             </div>
-            <div class="modal-footer"><button class="btn btn-primary" id="closeNotificationBtn">OK</button></div>
+            <div class="modal-footer"><button class="btn btn-primary" id="closeNotificationBtn">OK</button>
+            </div>
         </div>
     </div>
 
