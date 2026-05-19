@@ -10,37 +10,171 @@
 </head>
 
 <body>
+    <!-- Header -->
     <header>
-        <!-- Header content from index.html -->
+        <div class="logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
+        </div>
+        <nav class="nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="books.html">Books & Resources</a></li>
+                <li><a href="services.html" class="active">Services</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="collections.html">Special Collections</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="search-login">
+            <div id="auth-header-container"></div>
+        </div>
     </header>
+
+    <!-- Main Content -->
     <main>
         <section class="request-form-page">
-            <h2><i class="fa fa-book"></i> Book Reservation</h2>
+            <h2><i class="fa fa-calendar-check"></i> Book Reservation Form</h2>
             <form id="bookReservationForm" class="request-form">
+                <!-- User Information (pre-filled by app.js if logged in) -->
+                <h3>Your Information</h3>
                 <div class="form-group">
-                    <label for="bookTitle">Book Title *</label>
-                    <input type="text" id="bookTitle" required placeholder="Enter the title of the book">
+                    <label for="fullName">Full Name*</label>
+                    <input type="text" id="fullName" required readonly>
                 </div>
                 <div class="form-group">
-                    <label for="bookAuthor">Author *</label>
-                    <input type="text" id="bookAuthor" required placeholder="Enter the author's name">
+                    <label for="libraryCardNumber">Library Card Number*</label>
+                    <input type="text" id="libraryCardNumber" required readonly>
                 </div>
                 <div class="form-group">
-                    <label for="pickupDate">Preferred Pickup Date *</label>
+                    <label for="email">Email Address*</label>
+                    <input type="email" id="email" required readonly>
+                </div>
+
+                <!-- Book Details -->
+                <h3>Book Details</h3>
+                <div class="form-group">
+                    <label for="bookTitle">Book Title*</label>
+                    <input type="text" id="bookTitle" required placeholder="Enter the title of the book to reserve">
+                </div>
+                <div class="form-group">
+                    <label for="bookAuthor">Author(s)*</label>
+                    <input type="text" id="bookAuthor" required placeholder="Enter the author(s) of the book">
+                </div>
+
+                <!-- Reservation Period -->
+                <h3>Pickup Details</h3>
+                <div class="form-group">
+                    <label for="pickupDate">Preferred Pickup Date*</label>
                     <input type="date" id="pickupDate" required>
                 </div>
                 <div class="form-group">
-                    <label for="pickupTime">Preferred Pickup Time *</label>
-                    <input type="time" id="pickupTime" required>
+                    <label for="pickupTime">Preferred Pickup Time*</label>
+                    <select id="pickupTime" required>
+                        <option value="">Select a time slot</option>
+                        <option value="09:00-10:00">09:00 AM - 10:00 AM</option>
+                        <option value="10:00-11:00">10:00 AM - 11:00 AM</option>
+                        <option value="11:00-12:00">11:00 AM - 12:00 PM</option>
+                        <option value="14:00-15:00">02:00 PM - 03:00 PM</option>
+                        <option value="15:00-16:00">03:00 PM - 04:00 PM</option>
+                    </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit Reservation</button>
+
+                <p class="note">Note: Reservations are subject to book availability and library confirmation. You will
+                    be notified via email.</p>
+
+                <!-- Buttons -->
+                <button type="submit" class="btn btn-primary btn-block">Submit Reservation</button>
+                <button type="reset" class="btn btn-secondary btn-block">Clear Form</button>
             </form>
-            <div id="reservationFeedback" class="feedback-message" style="display:none;"></div>
+            <div id="reservationFeedback" class="feedback-message" style="display:none;">
+                <!-- Feedback and rating will be loaded here by app.js -->
+            </div>
         </section>
     </main>
+
+    <!-- Footer -->
     <footer>
-        <!-- Footer content from index.html -->
+        <div class="footer-bottom">
+            <p>© 2025 Bugema University. All rights reserved.</p>
+        </div>
     </footer>
+
+    <!-- Modals (for login/register/notifications) -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-sign-in-alt"></i> Library Login</h2>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fa fa-user-plus"></i> Library Registration</h2>
+            </div>
+            <form id="registerForm">
+                <div class="register-form-scroll">
+                    <div class="form-group"><label for="regFullName">Full Name *</label><input type="text"
+                            id="regFullName" required></div>
+                    <div class="form-group"><label for="regEmail">Email Address *</label><input type="email"
+                            id="regEmail" required></div>
+                    <div class="form-group"><label for="regPassword">Password *</label><input type="password"
+                            id="regPassword" required minlength="6"></div>
+                    <div class="form-group"><label for="regPhone">Phone Number *</label><input type="tel" id="regPhone"
+                            required></div>
+                    <div class="form-group">
+                        <label for="regUserType">User Type *</label>
+                        <select id="regUserType" required>
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty/Staff</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="regDepartment">Department</label><input type="text"
+                            id="regDepartment"></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register & Get Library Card</button>
+                <p class="form-footer">Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content success-content">
+            <i class="fa fa-check-circle"></i>
+            <h3>Success!</h3>
+            <p id="successMessage"></p>
+            <button class="btn btn-primary" id="closeSuccessBtn">Close</button>
+        </div>
+    </div>
+
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa fa-bell"></i> Notification</h3>
+            </div>
+            <div class="modal-body">
+                <p id="notificationMessage"></p>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" id="closeNotificationBtn">OK</button></div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 
