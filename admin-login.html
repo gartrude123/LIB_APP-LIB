@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Bugema University Library</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .admin-login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f4f7f6;
+        }
+
+        .admin-login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-login-wrapper">
+        <div class="admin-login-card">
+            <h2 style="text-align:center; margin-bottom:20px;"><i class="fa fa-user-shield"></i> Admin Portal Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginIdentifier">Library Card / Email</label>
+                    <input type="text" id="loginIdentifier" required placeholder="admin@bugemauniv.ac.ug">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="admin123">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Enter Admin Dashboard</button>
+                <p style="text-align:center; margin-top:20px;"><a href="index.html"><i class="fa fa-arrow-left"></i>
+                        Back to Main Site</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content success-content"><i class="fa fa-check-circle"></i>
+            <h3>Success!</h3>
+            <p id="successMessage"></p><button class="btn btn-primary" id="closeSuccessBtn">Close</button>
+        </div>
+    </div>
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa fa-bell"></i> Notification</h3>
+            </div>
+            <div class="modal-body">
+                <p id="notificationMessage"></p>
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary" id="closeNotificationBtn">OK</button></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
