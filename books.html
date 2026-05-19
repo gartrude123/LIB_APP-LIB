@@ -23,13 +23,7 @@
                 <li><a href="about.html">About Us</a></li>
                 <li><a href="collections.html">Special Collections</a></li>
                 <li><a href="contact.html">Contact Us</a></li>
-                <li class="nav-item-dropdown">
-                    <a href="#">Admin <i class="fa fa-caret-down"></i></a>
-                    <ul class="nav-dropdown-menu">
-                        <li><a href="adminA.html">Manage Users</a></li>
-                        <li><a href="admin-resources.html">Manage Resources</a></li>
-                    </ul>
-                </li>
+                <li><a href="adminA.html">Admin Panel</a>
             </ul>
         </nav>
         <div class="search-login">
@@ -314,12 +308,13 @@
             </div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginCardNumber">Library Card Number *</label>
-                    <input type="text" id="loginCardNumber" required placeholder="e.g., LIB-123456" maxlength="12">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
                 </div>
                 <div class="form-group">
-                    <label for="loginEmail">Email Address *</label>
-                    <input type="email" id="loginEmail" required placeholder="Enter your registered email">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
                 <p class="form-footer">Don't have an account? <a href="#" id="switchToRegister">Register here</a></p>
@@ -385,7 +380,11 @@
             <div class="ebook-reader-content">
                 <div id="pdf-viewer"
                     style="width: 100%; height: 75vh; background: #f0f0f0; border-radius: 8px; overflow: hidden; position: relative;">
-                    <iframe id="pdfFrame" src="" width="100%" height="100%" style="border: none;"></iframe>
+                    <div class="viewer-loader"
+                        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <i class="fa fa-spinner fa-spin fa-3x" style="color: #003366; margin-bottom: 10px;"></i>
+                        <p>Loading document...</p>
+                    </div>
                 </div>
                 <div class="ebook-actions" style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
                     <a id="readOnlineLink" class="btn btn-primary" target="_blank">
