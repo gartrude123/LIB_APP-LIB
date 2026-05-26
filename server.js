@@ -2,6 +2,14 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 const path = require("path");
+const dbpath = process.env.DB_PATH || path.join(__dirname, "library.db");
+const db = new sqlite3.Database(dbpath, (err) => {
+    if (err) {
+        console.error("Error opening database:", err.message);
+    } else {
+        console.log("Connected to SQLite database.", dbpath);
+    }
+});
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -11,25 +19,6 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 const JWT_SECRET = process.env.JWT_SECRET || "bugema_library_secure_secret_2025";
-
-// SQLite setup
-const db = new sqlite3.Database("./library.db", (err) => {
-    if (err) {
-        console.error("Error opening database:", err.message);
-    } else {
-        console.log("Connected to SQLite database.");
-    }
-});
-
-// Helper for standardizing error responses
-const handleError = (res, err, status = 500) => {
-    console.error("Database Error:", err.message);
-    return res.status(status).json({
-        error: err.message,
-        success: false,
-        timestamp: new Date().toISOString()
-    });
-};
 
 // ========== INITIALIZE DATABASE ==========
 function initDatabase() {
