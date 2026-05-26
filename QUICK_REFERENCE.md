@@ -16,13 +16,13 @@
 Open **terminal** (Command Prompt, PowerShell, or Terminal):
 
 ```bash
-cd "C:\Users\hp\prog demo\Desktop\LIB_APP"
+cd "c:\Users\hp\OneDrive\LIB_APP\LIB_APP"
 node server.js
 ```
 
 You should see:
 ```
-Bugema University Library Portal API running on http://localhost:5000
+Bugema University Library Portal API running on http://localhost:5001
 Connected to SQLite database.
 All tables created successfully
 Seeding database...
@@ -104,8 +104,8 @@ LIB_APP/
 - Check browser DevTools console (F12) for errors
 
 **Server not starting**
-- Check if port 5000 is already in use: `netstat -ano | findstr :5000`
-- Kill the process using port 5000, then retry
+- Check if port 5001 is already in use: `netstat -ano | findstr :5001` (CMD) or `Get-NetTCPConnection -LocalPort 5001` (PowerShell)
+- Kill the process using port 5001, then retry
 - Or change port in server.js: `const PORT = 5001;`
 
 **API calls failing**
