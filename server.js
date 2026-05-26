@@ -2,11 +2,15 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 const path = require("path");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
+
+const JWT_SECRET = process.env.JWT_SECRET || "bugema_library_secure_secret_2025";
 
 // SQLite setup
 const db = new sqlite3.Database("./library.db", (err) => {
@@ -30,14 +34,10 @@ const handleError = (res, err, status = 500) => {
 // ========== INITIALIZE DATABASE ==========
 function initDatabase() {
     db.serialize(() => {
-        // Drop existing tables (clean development)
-        const tables = ['access_logs', 'requests', 'questions', 'resources', 'books', 'users'];
-        tables.forEach(table => {
-            db.run(`DROP TABLE IF EXISTS ${table}`);
-        });
+        // We no longer drop tables here so that data persists across server restarts.
 
         // Users table
-        db.run(`CREATE TABLE users (
+        db.run(`CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             library_card_number TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL,
@@ -45,6 +45,7 @@ function initDatabase() {
             full_name TEXT NOT NULL,
             phone TEXT,
             user_type TEXT DEFAULT 'student',
+            status TEXT DEFAULT 'active',
             department TEXT,
             registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_login DATETIME
@@ -53,7 +54,7 @@ function initDatabase() {
         });
 
         // Books (physical books)
-        db.run(`CREATE TABLE books (
+        db.run(`CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             author TEXT NOT NULL,
@@ -65,13 +66,14 @@ function initDatabase() {
             copies_total INTEGER DEFAULT 1,
             copies_available INTEGER DEFAULT 1,
             available INTEGER DEFAULT 1,
+            rating INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`, (err) => {
             if (err) console.error("Error creating books table:", err.message);
         });
 
         // Resources (e-books, journals, databases, reference materials, research guides)
-        db.run(`CREATE TABLE resources (
+        db.run(`CREATE TABLE IF NOT EXISTS resources (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             type TEXT NOT NULL,
@@ -84,13 +86,14 @@ function initDatabase() {
             provider TEXT,
             category TEXT,
             is_available INTEGER DEFAULT 1,
+            rating INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`, (err) => {
             if (err) console.error("Error creating resources table:", err.message);
         });
 
         // Requests (book reservations & interlibrary loans)
-        db.run(`CREATE TABLE requests (
+        db.run(`CREATE TABLE IF NOT EXISTS requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             type TEXT NOT NULL,
@@ -102,6 +105,7 @@ function initDatabase() {
             status TEXT DEFAULT 'pending',
             request_date DATETIME DEFAULT CURRENT_TIMESTAMP,
             response_date DATETIME,
+            rating INTEGER,
             notes TEXT,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )`, (err) => {
@@ -109,7 +113,7 @@ function initDatabase() {
         });
 
         // Questions (help desk)
-        db.run(`CREATE TABLE questions (
+        db.run(`CREATE TABLE IF NOT EXISTS questions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             question TEXT NOT NULL,
@@ -118,13 +122,14 @@ function initDatabase() {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             response TEXT,
             responded_at DATETIME,
+            rating INTEGER,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )`, (err) => {
             if (err) console.error("Error creating questions table:", err.message);
         });
 
         // Access logs
-        db.run(`CREATE TABLE access_logs (
+        db.run(`CREATE TABLE IF NOT EXISTS access_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             action TEXT NOT NULL,
@@ -137,8 +142,30 @@ function initDatabase() {
         )`, (err) => {
             if (err) console.error("Error creating access_logs table:", err.message);
             else {
-                console.log("All tables created successfully");
-                seedData();
+                // Migration: Ensure rating column exists in both tables for existing databases
+                db.run("ALTER TABLE books ADD COLUMN rating INTEGER", (err) => {
+                    // Ignore error if column already exists
+                });
+                db.run("ALTER TABLE requests ADD COLUMN rating INTEGER", (err) => {
+                    // Ignore error if column already exists
+                });
+                db.run("ALTER TABLE resources ADD COLUMN rating INTEGER", () => {
+                    // Force re-seed of Admin to ensure bcrypt compatibility
+                    const salt = bcrypt.genSaltSync(10);
+                    const adminHash = bcrypt.hashSync('admin123', salt);
+
+                    // Ensure the Admin user exists and has the 'admin' role
+                    db.get("SELECT count(*) as count FROM users", (err, row) => {
+                        if (err) return;
+                        if (row && row.count === 0) {
+                            seedData();
+                        } else {
+                            db.run(`UPDATE users SET password = ?, user_type = 'admin' WHERE email = 'admin@bugemauniv.ac.ug'`, [adminHash], () => {
+                                console.log("Database verified. Admin credentials synchronized.");
+                            });
+                        }
+                    });
+                });
             }
         });
     });
@@ -148,21 +175,21 @@ function initDatabase() {
 function seedData() {
     console.log("Seeding database...");
 
+    const salt = bcrypt.genSaltSync(10);
     // Seed Users (for testing)
     const users = [
-        [1, 'LIB-100001', 'admin@bugemauniv.ac.ug', 'admin123', 'Library Admin', '+256700000001', 'faculty', 'Library'],
-        [2, 'LIB-100002', 'john.doe@students.bugemauniv.ac.ug', 'student123', 'John Doe', '+256700000002', 'student', 'Computer Science'],
-        [3, 'LIB-100003', 'jane.smith@students.bugemauniv.ac.ug', 'student123', 'Jane Smith', '+256700000003', 'student', 'Information Technology'],
-        [4, 'LIB-100004', 'mary.johnson@students.bugemauniv.ac.ug', 'student123', 'Mary Johnson', '+256700000004', 'student', 'Business Administration'],
-        [5, 'LIB-100005', 'prof.brown@bugemauniv.ac.ug', 'faculty123', 'Prof. Brown', '+256700000005', 'faculty', 'Faculty of Science']
+        [1, 'LIB-100001', 'admin@bugemauniv.ac.ug', bcrypt.hashSync('admin123', salt), 'Library Admin', '+256700000001', 'admin', 'Library'],
+        [2, 'LIB-100002', 'john.doe@students.bugemauniv.ac.ug', bcrypt.hashSync('student123', salt), 'John Doe', '+256700000002', 'student', 'Computer Science'],
+        [3, 'LIB-100003', 'jane.smith@students.bugemauniv.ac.ug', bcrypt.hashSync('student123', salt), 'Jane Smith', '+256700000003', 'student', 'Information Technology'],
+        [4, 'LIB-100004', 'mary.johnson@students.bugemauniv.ac.ug', bcrypt.hashSync('student123', salt), 'Mary Johnson', '+256700000004', 'student', 'Business Administration'],
+        [5, 'LIB-100005', 'prof.brown@bugemauniv.ac.ug', bcrypt.hashSync('faculty123', salt), 'Prof. Brown', '+256700000005', 'faculty', 'Faculty of Science']
     ];
 
-    users.forEach(([id, cardNum, email, pwd, name, phone, type, dept]) => {
+    users.forEach(([id, cardNum, email, password, name, phone, type, dept]) => {
         db.run(`INSERT OR IGNORE INTO users (id, library_card_number, email, password, full_name, phone, user_type, department)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [id, cardNum, email, pwd, name, phone, type, dept], function (err) {
-                if (err) console.error("Error inserting user:", err.message);
-            });
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [id, cardNum, email, password, name, phone, type, dept], function (err) {
+            if (err) console.error("Error inserting user:", err.message);
+        });
     });
 
     // Seed Physical Books - Academic, Religious, Political, Historical, Literature
@@ -310,17 +337,18 @@ initDatabase();
 // ============================================
 
 // Register a new user
-app.post("/api/register", (req, res) => {
+app.post("/api/register", async (req, res) => {
     const { email, password, fullName, phone, userType, department } = req.body;
     if (!email || !password || !fullName) {
         return res.status(400).json({ error: "Email, password, and full name are required" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     const libraryCardNumber = "LIB-" + Math.floor(100000 + Math.random() * 900000);
 
     db.run(
         `INSERT INTO users (library_card_number, email, password, full_name, phone, user_type, department) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [libraryCardNumber, email, password, fullName, phone || '', userType || 'student', department || ''],
+        [libraryCardNumber, email, hashedPassword, fullName, phone || '', userType || 'student', department || ''],
         function (err) {
             if (err) {
                 if (err.message.includes('UNIQUE constraint failed')) return res.status(400).json({ error: "Registration failed: This email or card number is already in use." });
@@ -343,20 +371,43 @@ app.post("/api/register", (req, res) => {
 
 // Login user
 app.post("/api/login", (req, res) => {
-    const { cardNumber, email } = req.body;
-    if (!cardNumber || !email) return res.status(400).json({ error: "Card number and email are required" });
+    const { identifier, password } = req.body;
+    if (!identifier || !password) return res.status(400).json({ error: "Identifier (card number or email) and password are required" });
 
-    db.get(`SELECT * FROM users WHERE library_card_number = ? AND email = ?`, [cardNumber, email], (err, row) => {
+    let query = `SELECT * FROM users WHERE (library_card_number = ? OR email = ?)`;
+    db.get(query, [identifier, identifier], async (err, row) => {
         if (err) return handleError(res, err);
+
         if (!row) {
-            return res.status(401).json({ error: "Invalid card number or email" });
+            return res.status(401).json({ error: "Invalid credentials" });
         }
+
+        try {
+            const isMatch = await bcrypt.compare(password, row.password);
+            if (!isMatch) {
+                return res.status(401).json({ error: "Invalid credentials" });
+            }
+
+            if (row.status === 'blocked') {
+                return res.status(403).json({ error: "Your account has been suspended. Please contact the administrator." });
+            }
+        } catch (authErr) {
+            console.error("Auth Exception:", authErr.message);
+            return res.status(500).json({ error: "Authentication system error. Please reset the database." });
+        }
+
+        const token = jwt.sign(
+            { id: row.id, role: row.user_type },
+            JWT_SECRET,
+            { expiresIn: '2h' }
+        );
 
         db.run("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?", [row.id]);
         db.run("INSERT INTO access_logs (user_id, action) VALUES (?, 'login')", [row.id]);
 
         res.json({
             message: "Login successful",
+            token,
             user: {
                 id: row.id,
                 libraryCardNumber: row.library_card_number,
@@ -488,13 +539,14 @@ app.get("/api/research-guides", (req, res) => {
 // ============================================
 
 app.get("/api/catalogue", (req, res) => {
-    const { q } = req.query;
-    const searchParam = `%${q || ''}%`;
+    const { q, prefix } = req.query;
+    const searchParam = prefix === 'true' ? `${q || ''}%` : `%${q || ''}%`;
 
     const query = `
         SELECT 'book' as type, id, title, author, 'Physical Book' as category,
                CASE WHEN copies_available > 0 AND available = 1 THEN 1 ELSE 0 END as available,
-               NULL as access_url
+               NULL as access_url,
+               rating
         FROM books
         WHERE title LIKE ? OR author LIKE ?
         UNION ALL
@@ -509,7 +561,8 @@ app.get("/api/catalogue", (req, res) => {
                    ELSE type
                END as category,
                is_available as available,
-               access_url
+               access_url,
+               rating
         FROM resources
         WHERE title LIKE ? OR author LIKE ?
         ORDER BY title
@@ -614,8 +667,260 @@ app.get("/api/health", (req, res) => {
     res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Bugema University Library Portal API running on http://localhost:${PORT}`);
+// ============================================
+// ADMIN API ENDPOINTS
+// ============================================
+
+// Middleware to simulate admin check (In production, use JWT/Sessions)
+const isAdmin = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) return res.status(401).json({ error: "No token provided" });
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err || !['faculty', 'admin'].includes(decoded.role)) {
+            return res.status(403).json({ error: "Access denied. Admin privileges required." });
+        }
+        req.user = decoded;
+        next();
+    });
+};
+
+// Get all users (Admin only)
+app.get("/api/admin/users", isAdmin, (req, res) => {
+    db.all("SELECT id, library_card_number, email, full_name, user_type, department, registered_at, last_login FROM users", [], (err, rows) => {
+        if (err) return handleError(res, err);
+        res.json(rows);
+    });
 });
+
+// Get all access logs (Admin only)
+app.get("/api/admin/logs", isAdmin, (req, res) => {
+    db.all(`SELECT l.*, u.full_name FROM access_logs l LEFT JOIN users u ON l.user_id = u.id ORDER BY timestamp DESC LIMIT 100`, [], (err, rows) => {
+        if (err) return handleError(res, err);
+        res.json(rows);
+    });
+});
+
+// Get all requests (Admin only)
+app.get("/api/admin/requests", isAdmin, (req, res) => {
+    db.all(`SELECT r.*, u.full_name as user_name FROM requests r JOIN users u ON r.user_id = u.id ORDER BY r.request_date DESC`, [], (err, rows) => {
+        if (err) return handleError(res, err);
+        res.json(rows);
+    });
+});
+
+// Get specific request details (Admin only)
+app.get("/api/admin/requests/:id", isAdmin, (req, res) => {
+    db.get(`SELECT r.*, u.full_name as user_name FROM requests r JOIN users u ON r.user_id = u.id WHERE r.id = ?`, [req.params.id], (err, row) => {
+        if (err) return handleError(res, err);
+        if (!row) return res.status(404).json({ error: "Request not found" });
+        res.json(row);
+    });
+});
+
+// Update request status / Confirm Payment (Admin only)
+app.put("/api/admin/requests/:id", isAdmin, (req, res) => {
+    const { status, notes } = req.body;
+    db.run("UPDATE requests SET status = ?, notes = ?, response_date = CURRENT_TIMESTAMP WHERE id = ?", [status || 'approved', notes || 'Confirmed by Admin', req.params.id], function (err) {
+        if (err) return handleError(res, err);
+        res.json({ message: "Request status updated and confirmed." });
+    });
+});
+
+// Update rating for a request
+app.put("/api/requests/:id/rate", (req, res) => {
+    const { rating } = req.body;
+    db.run("UPDATE requests SET rating = ? WHERE id = ?", [rating, req.params.id], function (err) {
+        if (err) return handleError(res, err);
+        res.json({ message: "Rating updated" });
+    });
+});
+
+// Update rating for a resource
+app.put("/api/resources/:id/rate", (req, res) => {
+    const { rating } = req.body;
+    db.run("UPDATE resources SET rating = ? WHERE id = ?", [rating, req.params.id], function (err) {
+        if (err) return handleError(res, err);
+        res.json({ message: "Rating updated" });
+    });
+});
+
+// Update rating for a question
+app.put("/api/questions/:id/rate", (req, res) => {
+    const { rating } = req.body;
+    db.run("UPDATE questions SET rating = ? WHERE id = ?", [rating, req.params.id], function (err) {
+        if (err) return handleError(res, err);
+        res.json({ message: "Rating updated" });
+    });
+});
+
+// Get all help desk questions (Admin only)
+app.get("/api/admin/questions", isAdmin, (req, res) => {
+    db.all(`SELECT q.*, u.full_name as user_name FROM questions q JOIN users u ON q.user_id = u.id ORDER BY q.created_at DESC`, [], (err, rows) => {
+        if (err) return handleError(res, err);
+        res.json(rows);
+    });
+});
+
+// Admin Stats Endpoint (Live counts)
+app.get("/api/admin/stats", isAdmin, (req, res) => {
+    const queries = {
+        totalUsers: "SELECT COUNT(*) as count FROM users",
+        activeToday: "SELECT COUNT(*) as count FROM access_logs WHERE action = 'login' AND date(timestamp) = date('now')",
+        totalBooks: "SELECT COUNT(*) as count FROM books",
+        totalResources: "SELECT COUNT(*) as count FROM resources"
+    };
+
+    const stats = {};
+    const keys = Object.keys(queries);
+    let completed = 0;
+
+    keys.forEach(key => {
+        db.get(queries[key], (err, row) => {
+            stats[key] = row ? row.count : 0;
+            completed++;
+            if (completed === keys.length) {
+                res.json(stats);
+            }
+        });
+    });
+});
+
+// Resource management endpoints (Admin only)
+app.get("/api/admin/books", isAdmin, (req, res) => {
+    db.all("SELECT * FROM books ORDER BY title", [], (err, rows) => {
+        if (err) return handleError(res, err);
+        res.json(rows);
+    });
+});
+
+app.get("/api/admin/resources", isAdmin, (req, res) => {
+    db.all("SELECT * FROM resources ORDER BY title", [], (err, rows) => {
+        if (err) return handleError(res, err);
+        res.json(rows);
+    });
+});
+
+// Respond to help desk questions (Admin only)
+app.put("/api/admin/questions/:id", isAdmin, (req, res) => {
+    const { response } = req.body;
+    db.run("UPDATE questions SET response = ?, status = 'closed', responded_at = CURRENT_TIMESTAMP WHERE id = ?", [response, req.params.id], function (err) {
+        if (err) return handleError(res, err);
+        res.json({ message: "Response sent successfully" });
+    });
+});
+
+// Resource CRUD operations
+app.post("/api/admin/books", isAdmin, (req, res) => {
+    const { title, author, isbn, publisher, year, category, quantity } = req.body;
+    db.run(`INSERT INTO books (title, author, isbn, publisher, publication_year, category, copies_total, copies_available, available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        [title, author, isbn, publisher, year, category, quantity, quantity], function (err) {
+            if (err) return handleError(res, err);
+            res.json({ message: "Book added successfully", id: this.lastID });
+        });
+});
+
+// Update book details (Admin only)
+app.put("/api/admin/books/:id", isAdmin, (req, res) => {
+    const { title, author, isbn, publisher, year, category, quantity } = req.body;
+    db.run(
+        `UPDATE books SET title = ?, author = ?, isbn = ?, publisher = ?, publication_year = ?, category = ?, copies_total = ?, copies_available = ? WHERE id = ?`,
+        [title, author, isbn, publisher, year, category, quantity, quantity, req.params.id],
+        function (err) {
+            if (err) return handleError(res, err);
+            res.json({ message: "Book updated successfully" });
+        }
+    );
+});
+
+// Update resource details (Admin only)
+app.put("/api/admin/resources/:id", isAdmin, (req, res) => {
+    const { title, type, url, provider, category, description } = req.body;
+    db.run(
+        `UPDATE resources SET title = ?, type = ?, access_url = ?, provider = ?, category = ?, description = ? WHERE id = ?`,
+        [title, type, url, provider, category, description, req.params.id],
+        function (err) {
+            if (err) return handleError(res, err);
+            res.json({ message: "Resource updated successfully" });
+        }
+    );
+});
+
+app.delete("/api/admin/books/:id", isAdmin, (req, res) => {
+    db.run("DELETE FROM books WHERE id = ?", [req.params.id], (err) => {
+        if (err) return handleError(res, err);
+        res.json({ message: "Book deleted successfully" });
+    });
+});
+
+app.post("/api/admin/resources", isAdmin, (req, res) => {
+    const { title, type, url, provider, category, description } = req.body;
+    db.run(`INSERT INTO resources (title, type, access_url, provider, category, description, is_available) VALUES (?, ?, ?, ?, ?, ?, 1)`,
+        [title, type, url, provider, category, description], function (err) {
+            if (err) return handleError(res, err);
+            res.json({ message: "Resource added successfully", id: this.lastID });
+        });
+});
+
+app.delete("/api/admin/resources/:id", isAdmin, (req, res) => {
+    db.run("DELETE FROM resources WHERE id = ?", [req.params.id], (err) => {
+        if (err) return handleError(res, err);
+        res.json({ message: "Resource deleted successfully" });
+    });
+});
+
+// Block user logic
+app.put("/api/admin/users/:id/block", isAdmin, (req, res) => {
+    const { reason } = req.body;
+    db.run("UPDATE users SET status = 'blocked' WHERE id = ?", [req.params.id], (err) => {
+        if (err) return handleError(res, err);
+        db.run("INSERT INTO access_logs (user_id, action, notes) VALUES (?, 'user_blocked', ?)", [req.params.id, reason]);
+        res.json({ message: "User has been blocked successfully" });
+    });
+});
+
+// Unblock user logic
+app.put("/api/admin/users/:id/unblock", isAdmin, (req, res) => {
+    db.run("UPDATE users SET status = 'active' WHERE id = ?", [req.params.id], (err) => {
+        if (err) return handleError(res, err);
+        db.run("INSERT INTO access_logs (user_id, action, notes) VALUES (?, 'user_unblocked', 'Restored by Admin')", [req.params.id]);
+        res.json({ message: "User access restored" });
+    });
+});
+
+// ============================================
+// ADVERTISEMENTS ENDPOINT
+// ============================================
+app.get("/api/advertisements", (req, res) => {
+    // This is a placeholder. In a real application, these would come from a database.
+    const ads = [
+        {
+            id: 1,
+            title: "New E-Book Collection Released!",
+            description: "Explore our latest additions to the Computer Science Department."
+        }
+    ];
+    res.json(ads);
+});
+// Start server
+const startServer = (port) => {
+    const server = app.listen(port)
+        .on('listening', () => {
+            console.log(`Bugema University Library Portal API running on http://localhost:${port}`);
+            console.log(`Open your browser and go to: http://localhost:${port}/index.html`);
+        })
+        .on('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+                console.warn(`Port ${port} is already in use. Trying port ${port + 1}...`);
+                startServer(port + 1);
+            } else {
+                console.error('Server startup error:', err.message);
+                process.exit(1);
+            }
+        });
+};
+
+const INITIAL_PORT = process.env.PORT || 5001;
+startServer(Number(INITIAL_PORT));
