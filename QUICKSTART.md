@@ -4,12 +4,12 @@
 
 ### 1. Start the Server
 ```bash
-cd "C:\Users\hp\prog demo\Desktop\LIB_APP"
+cd "c:\Users\hp\OneDrive\LIB_APP\LIB_APP"
 node server.js
 ```
 You should see:
 ```
-Bugema University Library Portal API running on http://localhost:5000
+Bugema University Library Portal API running on http://localhost:5001
 Connected to the SQLite database.
 All tables created successfully
 Seeding database...
@@ -19,7 +19,7 @@ Sample data seeded successfully
 ### 2. Open the Application
 Open your browser and go to:
 ```
-http://localhost:5000/books.html
+http://localhost:5001/books.html
 ```
 
 ### 3. Login or Register
@@ -123,7 +123,7 @@ To reset the database:
 ## Troubleshooting
 
 **Port 5000 already in use**
-Change the port in server.js: `const PORT = process.env.PORT || 5000;` → `const PORT = 5001;`
+Change the port in server.js: `const PORT = process.env.PORT || 5001;` → `const PORT = 5002;`
 
 **Images not loading**
 The project uses Font Awesome icons instead of images for resources. No external image dependencies.
