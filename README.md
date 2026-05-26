@@ -70,7 +70,7 @@ LIB_APP/
 
 1. Navigate to the project directory:
 ```bash
-cd "C:\Users\hp\prog demo\Desktop\LIB_APP"
+cd "c:\Users\hp\OneDrive\LIB_APP\LIB_APP"
 ```
 
 2. Install dependencies:
@@ -89,7 +89,7 @@ npm start
 
 4. Open your browser and navigate to:
 ```
-http://localhost:5000/books.html
+http://localhost:5001/books.html
 ```
 
 ## Usage Guide
