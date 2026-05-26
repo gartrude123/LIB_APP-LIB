@@ -13,7 +13,7 @@
     <!-- Header -->
     <header>
         <div class="logo">
-            <img src="log.jpeg" alt="Library Logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
         </div>
         <nav class="nav">
             <ul>
@@ -23,13 +23,10 @@
                 <li><a href="about.html">About Us</a></li>
                 <li><a href="collections.html">Special Collections</a></li>
                 <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="admin-login.html">Admin Panel</a></li>
             </ul>
         </nav>
         <div class="search-login">
-            <div class="search-wrapper">
-                <input type="text" id="globalSearch" placeholder="Search catalogue...">
-                <button class="btn search-btn"><i class="fa fa-search"></i></button>
-            </div>
             <div id="auth-header-container">
                 <button class="btn login-btn" id="headerLoginBtn"><i class="fa fa-user"></i> Login</button>
             </div>
@@ -175,10 +172,15 @@
                 <h2><i class="fa fa-sign-in-alt"></i> Library Login</h2>
             </div>
             <form id="loginForm">
-                <div class="form-group"><label for="loginCardNumber">Library Card Number *</label><input type="text"
-                        id="loginCardNumber" required></div>
-                <div class="form-group"><label for="loginEmail">Email Address *</label><input type="email"
-                        id="loginEmail" required></div>
+                <div class="form-group">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
                 <p class="form-footer" style="text-align:center; margin-top:15px; color:#666;">Don't have an account? <a
                         href="#" id="switchToRegister" style="color:var(--secondary-blue); font-weight:600;">Register
