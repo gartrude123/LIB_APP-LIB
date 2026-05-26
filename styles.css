@@ -392,49 +392,64 @@ nav a.active {
     border-bottom: none;
 }
 
-.receipt-box p {
-    margin: 5px 0;
-    color: #333 !important;
-    text-shadow: none !important;
-    font-size: 0.9em;
-    border-bottom: 1px dotted #ccc;
-    padding-bottom: 2px;
-}
-
-.receipt-box p {
-    margin: 5px 0;
-    color: #333 !important;
-    text-shadow: none !important;
-    font-size: 0.9em;
-    border-bottom: 1px dotted #ccc;
-    padding-bottom: 2px;
-}
-
 /* Cost Summary styling */
 .cost-summary {
-    background: #f8f9ff;
-    border: 1px solid var(--border-color);
+    background: #fdfdfd;
+    /* Lighter background for receipt feel */
+    border: 1px dashed #ccc;
+    /* Dashed border to mimic thermal paper */
     border-radius: 8px;
     padding: 20px;
     margin-top: 30px;
     text-align: left;
+    font-family: 'Consolas', 'Courier New', monospace;
+    /* Monospace font for receipt look */
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .cost-summary h3 {
     margin-top: 0;
-    color: var(--primary-blue);
-    border-bottom: 1px solid #eee;
+    color: var(--text-dark);
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+    /* Thicker separator */
     padding-bottom: 10px;
     margin-bottom: 15px;
+    font-size: 1.2em;
 }
 
 .cost-summary p {
-    margin-bottom: 8px;
-    font-size: 1.05em;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 1em;
+    padding-bottom: 4px;
+    border-bottom: 1px dotted #eee;
+    /* Dotted line for item separation */
 }
 
 .cost-summary p strong {
-    color: var(--text-dark);
+    color: #000;
+    /* Stronger black for labels */
+    font-weight: 700;
+}
+
+/* Special styling for the total cost line */
+.cost-summary p:last-of-type {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 2px dashed #ccc;
+    /* Dashed line above total */
+    border-bottom: none;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: var(--primary-blue);
+    /* Highlight total cost */
+}
+
+.cost-summary p:last-of-type strong {
+    color: var(--primary-blue);
 }
 
 .feedback-message .btn {
@@ -1062,6 +1077,11 @@ nav a.active {
 .availability-badge.unavailable {
     background: #f8d7da;
     color: #721c24;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .search-results .result-item:hover {
