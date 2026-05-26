@@ -13,13 +13,13 @@
     <!-- Header -->
     <header>
         <div class="logo">
-            <img src="log.jpeg" alt="Library Logo">
+            <a href="index.html"><img src="log.jpeg" alt="Library Logo"></a>
         </div>
         <nav class="nav">
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="books.html">Books & Resources</a></li>
-                <li><a href="services.html">Services</a></li>
+                <li><a href="services.html" class="active">Services</a></li>
                 <li><a href="about.html">About Us</a></li>
                 <li><a href="collections.html">Special Collections</a></li>
                 <li><a href="contact.html">Contact Us</a></li>
@@ -129,7 +129,6 @@
                     <label><input type="checkbox" id="agreeCharges" required> I agree to the service charges and library
                         policies.</label>
                 </div>
-
                 <!-- Buttons -->
                 <button type="submit" class="btn btn-primary">Submit Request</button>
                 <button type="reset" class="btn btn-secondary">Cancel</button>
@@ -212,10 +211,15 @@
                 <h2><i class="fa fa-sign-in-alt"></i> Library Login</h2>
             </div>
             <form id="loginForm">
-                <div class="form-group"><label for="loginCardNumber">Library Card Number *</label><input type="text"
-                        id="loginCardNumber" required></div>
-                <div class="form-group"><label for="loginEmail">Email Address *</label><input type="email"
-                        id="loginEmail" required></div>
+                <div class="form-group">
+                    <label for="loginIdentifier">Library Card Number / Email *</label>
+                    <input type="text" id="loginIdentifier" required
+                        placeholder="Enter your library card number or email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password *</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
                 <p class="form-footer" style="text-align:center; margin-top:15px; color:#666;">Don't have an account? <a
                         href="#" id="switchToRegister" style="color:var(--secondary-blue); font-weight:600;">Register
