@@ -1,15 +1,11 @@
 const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
+const Database = require("better-sqlite3");
 const cors = require("cors");
 const path = require("path");
-const dbpath = process.env.DB_PATH || path.join(__dirname, "library.db");
-const db = new sqlite3.Database(dbpath, (err) => {
-    if (err) {
-        console.error("Error opening database:", err.message);
-    } else {
-        console.log("Connected to SQLite database.", dbpath);
-    }
-});
+const dbpath = process.env.DB_PATH || '/var/data/library.db';
+const db = new Database(dbpath);
+console.log("connected to SQlite database: ", dbpath);
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -21,29 +17,28 @@ app.use(express.static(__dirname));
 const JWT_SECRET = process.env.JWT_SECRET || "bugema_library_secure_secret_2025";
 
 // ========== INITIALIZE DATABASE ==========
+
 function initDatabase() {
-    db.serialize(() => {
-        // We no longer drop tables here so that data persists across server restarts.
 
-        // Users table
-        db.run(`CREATE TABLE IF NOT EXISTS users (
+    db.exec(`CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            library_card_number TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            full_name TEXT NOT NULL,
-            phone TEXT,
-            user_type TEXT DEFAULT 'student',
-            status TEXT DEFAULT 'active',
-            department TEXT,
-            registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            last_login DATETIME
-        )`, (err) => {
-            if (err) console.error("Error creating users table:", err.message);
-        });
+        library_card_number TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        full_name TEXT NOT NULL,
+        phone TEXT,
+        user_type TEXT DEFAULT 'student',
+        status TEXT DEFAULT 'active',
+        department TEXT,
+        registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        last_login DATETIME 
+     )`);
 
-        // Books (physical books)
-        db.run(`CREATE TABLE IF NOT EXISTS books (
+
+
+
+    // Books (physical books);
+    db.exec(`CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             author TEXT NOT NULL,
@@ -57,12 +52,11 @@ function initDatabase() {
             available INTEGER DEFAULT 1,
             rating INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`, (err) => {
-            if (err) console.error("Error creating books table:", err.message);
-        });
+        )`,
+    );
 
-        // Resources (e-books, journals, databases, reference materials, research guides)
-        db.run(`CREATE TABLE IF NOT EXISTS resources (
+    // Resources (e-books, journals, databases, reference materials, research guides)
+    db.exec(`CREATE TABLE IF NOT EXISTS resources (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             type TEXT NOT NULL,
@@ -77,12 +71,11 @@ function initDatabase() {
             is_available INTEGER DEFAULT 1,
             rating INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`, (err) => {
-            if (err) console.error("Error creating resources table:", err.message);
-        });
+        )`,
+    );
 
-        // Requests (book reservations & interlibrary loans)
-        db.run(`CREATE TABLE IF NOT EXISTS requests (
+    // Requests (book reservations & interlibrary loans)
+    db.exec(`CREATE TABLE IF NOT EXISTS requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             type TEXT NOT NULL,
@@ -97,12 +90,10 @@ function initDatabase() {
             rating INTEGER,
             notes TEXT,
             FOREIGN KEY (user_id) REFERENCES users(id)
-        )`, (err) => {
-            if (err) console.error("Error creating requests table:", err.message);
-        });
+        )`);
 
-        // Questions (help desk)
-        db.run(`CREATE TABLE IF NOT EXISTS questions (
+    // Questions (help desk)
+    db.exec(`CREATE TABLE IF NOT EXISTS questions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             question TEXT NOT NULL,
@@ -113,12 +104,10 @@ function initDatabase() {
             responded_at DATETIME,
             rating INTEGER,
             FOREIGN KEY (user_id) REFERENCES users(id)
-        )`, (err) => {
-            if (err) console.error("Error creating questions table:", err.message);
-        });
+        )`);
 
-        // Access logs
-        db.run(`CREATE TABLE IF NOT EXISTS access_logs (
+    // Access logs
+    db.exec(`CREATE TABLE IF NOT EXISTS access_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             action TEXT NOT NULL,
@@ -128,38 +117,43 @@ function initDatabase() {
             user_agent TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
-        )`, (err) => {
-            if (err) console.error("Error creating access_logs table:", err.message);
-            else {
-                // Migration: Ensure rating column exists in both tables for existing databases
-                db.run("ALTER TABLE books ADD COLUMN rating INTEGER", (err) => {
-                    // Ignore error if column already exists
-                });
-                db.run("ALTER TABLE requests ADD COLUMN rating INTEGER", (err) => {
-                    // Ignore error if column already exists
-                });
-                db.run("ALTER TABLE resources ADD COLUMN rating INTEGER", () => {
-                    // Force re-seed of Admin to ensure bcrypt compatibility
-                    const salt = bcrypt.genSaltSync(10);
-                    const adminHash = bcrypt.hashSync('admin123', salt);
+        )`);
 
-                    // Ensure the Admin user exists and has the 'admin' role
-                    db.get("SELECT count(*) as count FROM users", (err, row) => {
-                        if (err) return;
-                        if (row && row.count === 0) {
-                            seedData();
-                        } else {
-                            db.run(`UPDATE users SET password = ?, user_type = 'admin' WHERE email = 'admin@bugemauniv.ac.ug'`, [adminHash], () => {
-                                console.log("Database verified. Admin credentials synchronized.");
-                            });
-                        }
-                    });
-                });
-            }
-        });
-    });
+    // Migration: Ensure rating column exists in both tables
+    // Wrap each ALTER in try/catch because it throws if column already exists
+    try {
+        db.exec(`ALTER TABLE books ADD COLUMN rating INTEGER`);
+    } catch (e) { }
+
+    try {
+        db.exec(`ALTER TABLE requests ADD COLUMN rating INTEGER`);
+    } catch (e) { }
+
+    try {
+        db.exec(`ALTER TABLE resources ADD COLUMN rating INTEGER`);
+    } catch (e) { }
+
+    // Force re-seed of Admin to ensure bcrypt compatibility
+    const salt = bcrypt.genSaltSync(10);
+    const adminHash = bcrypt.hashSync('admin123', salt);
+
+    // Check if admin user exists - NO CALLBACKS
+    const stmt = db.prepare(`SELECT count(*) as count FROM users WHERE user_type = 'admin'`);
+    const row = stmt.get();
+
+    if (row && row.count === 0) {
+        seedData();
+    } else {
+        // Update existing admin
+        const updateStmt = db.prepare(`UPDATE users SET password = ?, user_type = 'admin' WHERE email = 'admin@library.com'`);
+        updateStmt.run(adminHash);
+        console.log("Database verified. Admin credentials synced.");
+    }
+    try {
+    } catch (err) {
+        console.error("Database init error:", err.message);
+    }
 }
-
 // ========== SEED DATA ==========
 function seedData() {
     console.log("Seeding database...");
@@ -175,7 +169,7 @@ function seedData() {
     ];
 
     users.forEach(([id, cardNum, email, password, name, phone, type, dept]) => {
-        db.run(`INSERT OR IGNORE INTO users (id, library_card_number, email, password, full_name, phone, user_type, department)
+        db.exec(`INSERT OR IGNORE INTO users (id, library_card_number, email, password, full_name, phone, user_type, department)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [id, cardNum, email, password, name, phone, type, dept], function (err) {
             if (err) console.error("Error inserting user:", err.message);
         });
@@ -215,7 +209,7 @@ function seedData() {
     ];
 
     books.forEach(([id, title, author, isbn, publisher, year, desc, cat, total, available]) => {
-        db.run(`INSERT OR IGNORE INTO books (id, title, author, isbn, publisher, publication_year, description, category, copies_total, copies_available, available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        db.exec(`INSERT OR IGNORE INTO books (id, title, author, isbn, publisher, publication_year, description, category, copies_total, copies_available, available) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
             [id, title, author, isbn, publisher, year, desc, cat, total, available], function (err) {
                 if (err) console.error("Error inserting book:", err.message);
             });
@@ -237,7 +231,7 @@ function seedData() {
     ];
 
     ebooks_data.forEach(([title, author, pub_date, desc, url, category]) => {
-        db.run(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, 'ebook', ?, ?, ?, ?, ?)`,
+        db.exec(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, 'ebook', ?, ?, ?, ?, ?)`,
             [title, author, pub_date, desc, url, category], function (err) {
                 if (err) console.error("Error inserting ebook:", err.message);
             });
@@ -254,7 +248,7 @@ function seedData() {
     ];
 
     journals.forEach(([title, type, author, pub_date, desc, url, category]) => {
-        db.run(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        db.exec(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [title, type, author, pub_date, desc, url, category], function (err) {
                 if (err) console.error("Error inserting journal:", err.message);
             });
@@ -273,7 +267,7 @@ function seedData() {
     ];
 
     databases.forEach(([title, type, author, pub_date, desc, url, provider, category]) => {
-        db.run(`INSERT OR IGNORE INTO resources (title, type, author, description, access_url, provider, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        db.exec(`INSERT OR IGNORE INTO resources (title, type, author, description, access_url, provider, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [title, type, author, desc, url, provider, category], function (err) {
                 if (err) console.error("Error inserting database:", err.message);
             });
@@ -290,7 +284,7 @@ function seedData() {
     ];
 
     references.forEach(([title, type, author, pub_date, desc, url, category]) => {
-        db.run(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        db.exec(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [title, type, author, pub_date, desc, url, category], function (err) {
                 if (err) console.error("Error inserting reference:", err.message);
             });
@@ -309,7 +303,7 @@ function seedData() {
     ];
 
     guides.forEach(([title, type, author, pub_date, desc, url, category]) => {
-        db.run(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        db.exec(`INSERT OR IGNORE INTO resources (title, type, author, publication_date, description, access_url, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [title, type, author, pub_date, desc, url, category], function (err) {
                 if (err) console.error("Error inserting guide:", err.message);
             });
@@ -335,7 +329,7 @@ app.post("/api/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const libraryCardNumber = "LIB-" + Math.floor(100000 + Math.random() * 900000);
 
-    db.run(
+    db.exec(
         `INSERT INTO users (library_card_number, email, password, full_name, phone, user_type, department) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [libraryCardNumber, email, hashedPassword, fullName, phone || '', userType || 'student', department || ''],
         function (err) {
@@ -391,8 +385,8 @@ app.post("/api/login", (req, res) => {
             { expiresIn: '2h' }
         );
 
-        db.run("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?", [row.id]);
-        db.run("INSERT INTO access_logs (user_id, action) VALUES (?, 'login')", [row.id]);
+        db.exec("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?", [row.id]);
+        db.exec("INSERT INTO access_logs (user_id, action) VALUES (?, 'login')", [row.id]);
 
         res.json({
             message: "Login successful",
@@ -415,19 +409,26 @@ app.post("/api/login", (req, res) => {
 // ============================================
 
 app.get("/api/books", (req, res) => {
-    db.all(`SELECT * FROM books WHERE available = 1 ORDER BY title`, [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
+    try {
+        const stmt = db.prepare("SELECT * FROM books ORDER BY title");
+        const rows = stmt.all();
         res.json(rows);
-    });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get("/api/books/:id", (req, res) => {
-    db.get(`SELECT * FROM books WHERE id = ?`, [req.params.id], (err, row) => {
-        if (err) return res.status(500).json({ error: err.message });
+    try {
+        const stmt = db.prepare("SELECT * FROM books WHERE id = ?");
+        const row = stmt.get(req.params.id);
         if (!row) return res.status(404).json({ error: "Book not found" });
         res.json(row);
-    });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
+
 
 // ============================================
 // RESOURCES ENDPOINT (E-Books, Journals, Databases, Reference)
