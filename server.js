@@ -1,8 +1,14 @@
 const express = require("express");
+const fs = require("fs");
 const Database = require("better-sqlite3");
 const cors = require("cors");
 const path = require("path");
-const dbpath = process.env.DB_PATH || '/var/data/library.db';
+const dbDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+}
+
+const dbpath = process.env.DB_PATH || path.join(dbDir, 'library.db');
 const db = new Database(dbpath);
 console.log("connected to SQlite database: ", dbpath);
 
