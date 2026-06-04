@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const Database = require("better-sqlite3");
 const cors = require("cors");
+const path = require("path");
 const dbDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
